@@ -1,0 +1,32 @@
+{
+  "name": "llm-chat",
+  "version": "1.0.0",
+  "description": "A full stack chat application for LLMs",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "cd frontend && pnpm dev",
+    "dev:backend": "cd backend && pnpm dev",
+    "dev": "concurrently \"pnpm dev:frontend\" \"pnpm dev:backend\"",
+    "build:frontend": "cd frontend && pnpm build",
+    "build:backend": "cd backend && pnpm build",
+    "build": "pnpm build:frontend && pnpm build:backend"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.9.0",
+  "devDependencies": {
+    "@eslint/js": "^9.25.1",
+    "@typescript-eslint/eslint-plugin": "^8.31.0",
+    "@typescript-eslint/parser": "^8.31.0",
+    "concurrently": "^9.1.2",
+    "eslint": "^9.25.1",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3",
+    "typescript-eslint": "^8.31.0"
+  }
+}
