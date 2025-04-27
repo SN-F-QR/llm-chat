@@ -13,7 +13,7 @@ const App = () => {
         console.error('Error fetching message:', error);
       }
     };
-    testGet();
+    void testGet();
   }, []);
 
   return (

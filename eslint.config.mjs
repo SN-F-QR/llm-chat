@@ -5,7 +5,10 @@ import pluginReact from 'eslint-plugin-react';
 import { defineConfig } from 'eslint/config';
 
 export default defineConfig([
-  { ignores: ['dist'] },
+  { ignores: ['dist', '**/*.mjs', '**/*.config.js'] },
+  tseslint.configs.recommendedTypeChecked,
+  pluginReact.configs.flat['jsx-runtime'],
+  tseslint.configs.stylisticTypeChecked,
   {
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
     languageOptions: { ecmaVersion: 2022 },
@@ -14,8 +17,12 @@ export default defineConfig([
   { files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'], plugins: { js }, extends: ['js/recommended'] },
   {
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
-    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.node },
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
   },
-  tseslint.configs.recommended,
-  pluginReact.configs.flat.recommended,
 ]);
