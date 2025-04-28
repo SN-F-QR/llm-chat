@@ -1,0 +1,34 @@
+// import { useEffect, useState } from 'react';
+// import axios from 'axios';
+
+import NavBar from '../components/NavBar';
+import Chat from './Chat';
+
+const App = () => {
+  // const [message, setMessage] = useState<string>('');
+
+  // useEffect(() => {
+  //   const testGet = async () => {
+  //     try {
+  //       const res = await axios.get<{ message: string }>('/api');
+  //       setMessage(res.data.message);
+  //     } catch (error) {
+  //       console.error('Error fetching message:', error);
+  //     }
+  //   };
+  //   void testGet();
+  // }, []);
+
+  return (
+    <div className="flex h-dvh w-dvw flex-col">
+      <NavBar />
+      {/* <div className="flex items-center justify-between p-4">
+        <h1 className="text-xl text-pink-500">Welcome to the LLM chat</h1>
+        <p className="">Server status: {message}</p>
+      </div> */}
+      <Chat />
+    </div>
+  );
+};
+
+export default App;
