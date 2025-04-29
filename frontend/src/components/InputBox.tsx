@@ -1,7 +1,7 @@
 import { SendHorizontal } from 'lucide-react';
 import { useRef } from 'react';
 
-const InputBox = () => {
+const InputBox: React.FC<{ submitFunc: (arg: FormData) => Promise<void> }> = ({ submitFunc }) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleTextInput = () => {
@@ -12,8 +12,8 @@ const InputBox = () => {
   };
 
   return (
-    <div className="max-h-72 min-h-24 w-full max-w-xl rounded-2xl border border-gray-200 p-4 shadow-sm">
-      <form className="flex h-full w-full flex-col justify-between">
+    <div className="max-h-72 min-h-24 w-full max-w-xl overflow-hidden rounded-2xl border border-gray-200 p-4 shadow-sm">
+      <form className="flex h-full w-full flex-col justify-between" action={submitFunc}>
         <textarea
           ref={textAreaRef}
           name="messageInput"

@@ -20,13 +20,15 @@ const App = () => {
   // }, []);
 
   return (
-    <div className="flex h-dvh w-dvw flex-col">
-      <NavBar />
-      {/* <div className="flex items-center justify-between p-4">
+    <div className="flex min-h-dvh w-full flex-col overflow-auto">
+      <div className="relative flex w-full flex-grow flex-col">
+        <NavBar />
+        {/* <div className="flex items-center justify-between p-4">
         <h1 className="text-xl text-pink-500">Welcome to the LLM chat</h1>
         <p className="">Server status: {message}</p>
       </div> */}
-      <Chat />
+        <Chat />
+      </div>
     </div>
   );
 };
