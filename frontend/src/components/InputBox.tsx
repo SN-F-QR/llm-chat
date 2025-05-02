@@ -1,22 +1,36 @@
 import { SendHorizontal } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
-const InputBox: React.FC<{ submitFunc: (arg: FormData) => Promise<void> }> = ({ submitFunc }) => {
+const InputBox: React.FC<{ submitFunc: (arg: string) => Promise<void> }> = ({ submitFunc }) => {
+  const [text, setText] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleTextInput = () => {
+  const handleTextInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
     if (textAreaRef.current) {
       textAreaRef.current.style.height = 'auto';
       textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
     }
   };
 
+  const handleSubmit = async () => {
+    console.log('Submitting message:', text);
+    try {
+      await submitFunc(text);
+    } catch {
+      console.error('Error submitting message:', text);
+    } finally {
+      setText('');
+      if (textAreaRef.current) {
+        textAreaRef.current.value = '';
+        textAreaRef.current.style.height = 'auto';
+      }
+    }
+  };
+
   return (
     <div className="w-full max-w-xl rounded-2xl border border-gray-200 p-4 shadow-sm">
-      <form
-        className="flex max-h-72 min-h-20 w-full flex-col justify-between overflow-hidden"
-        action={submitFunc}
-      >
+      <div className="flex max-h-72 min-h-20 w-full flex-col justify-between overflow-hidden">
         <textarea
           ref={textAreaRef}
           name="messageInput"
@@ -26,11 +40,11 @@ const InputBox: React.FC<{ submitFunc: (arg: FormData) => Promise<void> }> = ({ 
         ></textarea>
         <span className="flex items-center justify-between">
           <span></span>
-          <button type="submit" className="">
+          <button onClick={() => void handleSubmit()}>
             <SendHorizontal className="size-8 cursor-pointer rounded-lg bg-purple-500 p-1 text-white" />
           </button>
         </span>
-      </form>
+      </div>
     </div>
   );
 };
