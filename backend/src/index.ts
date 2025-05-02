@@ -1,14 +1,22 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+
+import apiRouter from './api';
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
+const staticPath = path.join(__dirname, '../../frontend/dist');
 
 app.use(cors());
 app.use(express.json());
 
-app.get('/api', (req, res) => {
-  res.json({ message: 'The backend for LLM-Chat is running.' });
+app.use('/api', apiRouter);
+
+app.use(express.static(staticPath));
+// From express v5, using a new format of regex
+app.get(/(.*)/, (_req, res) => {
+  res.sendFile(path.join(staticPath, 'index.html'));
 });
 
 app.listen(PORT, () => {
