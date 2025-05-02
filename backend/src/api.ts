@@ -13,10 +13,13 @@ apiRouter.use(express.json());
 apiRouter.post('/chat', async (req, res) => {
   try {
     const { content } = req.body as { content: string };
-    console.log('Received content:', content);
     const response = await llm.models.generateContent({
       model: 'gemini-2.0-flash',
       contents: content,
+      config: {
+        temperature: 1.2,
+        maxOutputTokens: 200,
+      },
     });
     res.json({ content: response.text });
   } catch (error) {
