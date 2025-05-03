@@ -1,18 +1,16 @@
-import express, { type Router } from 'express';
+import { Hono } from 'hono';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const apiRouter: Router = express.Router();
+const apiRouter = new Hono();
 
 const llm = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
-apiRouter.use(express.json());
-
-apiRouter.post('/chat', async (req, res) => {
+apiRouter.post('/chat', async (c) => {
   try {
-    const { content } = req.body as { content: string };
+    const { content }: { content: string } = await c.req.json();
     const response = await llm.models.generateContent({
       model: 'gemini-2.0-flash',
       contents: content,
@@ -21,10 +19,11 @@ apiRouter.post('/chat', async (req, res) => {
         maxOutputTokens: 200,
       },
     });
-    res.json({ content: response.text });
+    return c.json({ content: response.text });
   } catch (error) {
     console.error('Error in /chat route:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    c.status(500);
+    return c.json({ error: 'Failed to chat with Gemini API' });
   }
 });
 
