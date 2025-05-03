@@ -17,3 +17,5 @@ serve({
   fetch: app.fetch,
   port: PORT,
 });
+
+export default app;

@@ -10,7 +10,8 @@
     "dev": "concurrently \"pnpm dev:frontend\" \"pnpm dev:backend\"",
     "build:frontend": "cd frontend && pnpm build",
     "build:backend": "cd backend && pnpm build",
-    "build": "pnpm build:frontend && pnpm build:backend"
+    "build": "pnpm build:frontend && pnpm build:backend",
+    "test": "cd backend && pnpm test:ci"
   },
   "keywords": [],
   "author": "",
