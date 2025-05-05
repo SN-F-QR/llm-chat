@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 
 const InputBox: React.FC<{ submitFunc: (arg: string) => Promise<void> }> = ({ submitFunc }) => {
   const [text, setText] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleTextInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -16,15 +17,17 @@ const InputBox: React.FC<{ submitFunc: (arg: string) => Promise<void> }> = ({ su
   const handleSubmit = async () => {
     console.log('Submitting message:', text);
     try {
+      setIsSubmitting(true);
+      if (textAreaRef.current) {
+        textAreaRef.current.value = '';
+        textAreaRef.current.style.height = 'auto';
+      }
       await submitFunc(text);
     } catch {
       console.error('Error submitting message:', text);
     } finally {
       setText('');
-      if (textAreaRef.current) {
-        textAreaRef.current.value = '';
-        textAreaRef.current.style.height = 'auto';
-      }
+      setIsSubmitting(false);
     }
   };
 
@@ -40,7 +43,7 @@ const InputBox: React.FC<{ submitFunc: (arg: string) => Promise<void> }> = ({ su
         ></textarea>
         <span className="flex items-center justify-between">
           <span></span>
-          <button onClick={() => void handleSubmit()}>
+          <button onClick={() => void handleSubmit()} disabled={isSubmitting}>
             <SendHorizontal className="size-8 cursor-pointer rounded-lg bg-purple-500 p-1 text-white" />
           </button>
         </span>

@@ -21,4 +21,26 @@ describe('main test', () => {
     expect(body.content).toBeTypeOf('string');
     expect(body.content.length).toBeGreaterThan(0);
   });
+
+  test('POST /api/chat-stream', async () => {
+    const response = await app.request('/api/chat-stream', {
+      method: 'POST',
+      body: JSON.stringify({ content: 'Can you tell me a joke in 100 words?' }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    expect(response.status).toBe(200);
+    expect(response.body).not.toBeNull();
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+      const text = decoder.decode(value);
+      expect(text.length).toBeGreaterThan(0);
+    }
+  });
 });
