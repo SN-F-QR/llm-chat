@@ -107,7 +107,7 @@ const Chat = () => {
   };
 
   const sendNewMessage = async (content: string) => {
-    await updateMessage(content);
+    await updateMessage(content, true);
   };
 
   return (
@@ -115,6 +115,7 @@ const Chat = () => {
       <ConversationBox
         messageList={messages}
         waiting={waiting}
+        streaming={true}
         failedMessageId={failedMessageId}
         reSendMessage={updateMessage}
       />

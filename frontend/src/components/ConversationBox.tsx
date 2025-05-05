@@ -5,14 +5,15 @@ import Markdown from 'react-markdown';
 const ConversationBox: React.FC<{
   messageList: Message[];
   waiting: boolean;
+  streaming: boolean;
   failedMessageId: string | undefined;
   reSendMessage: (message: string, stream: boolean, id: string) => Promise<void>;
-}> = ({ messageList, waiting, failedMessageId, reSendMessage }) => {
+}> = ({ messageList, waiting, streaming, failedMessageId, reSendMessage }) => {
   return (
     <div className="flex w-full max-w-3xl flex-col space-y-4 rounded-2xl p-4">
       {messageList.map((message) => (
         <div className="flex items-end space-x-2" key={`${message.id}-${message.role}`}>
-          <MessageBuble message={message} />
+          <MessageBuble message={message} updating={waiting} />
           {message.id === failedMessageId && (
             <span className="flex items-center space-x-2">
               <TriangleAlert className="size-4 text-red-400" />
@@ -26,7 +27,7 @@ const ConversationBox: React.FC<{
           )}
         </div>
       ))}
-      {waiting && (
+      {waiting && !streaming && (
         <div className="flex w-full animate-pulse">
           <div className="py-2">
             <Sparkle className="size-6 text-purple-600" />
@@ -42,19 +43,19 @@ const ConversationBox: React.FC<{
   );
 };
 
-const MessageBuble: React.FC<{ message: Message }> = ({ message }) => {
+const MessageBuble: React.FC<{ message: Message; updating: boolean }> = ({ message }) => {
   return (
-    <div className="flex">
+    <div className="flex w-full">
       {message.role === 'user' ? (
         <div className="max-w-lg rounded-lg bg-purple-400 p-2 text-white">
           <p>{message.content}</p>
         </div>
       ) : (
-        <div className="flex">
+        <div className="flex w-full">
           <div className="py-2">
             <Sparkle className="size-6 text-purple-600" />
           </div>
-          <div className="w-full p-2">
+          <div className="w-full p-2 break-words">
             <Markdown>{message.content}</Markdown>
           </div>
         </div>

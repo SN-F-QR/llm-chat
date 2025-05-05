@@ -36,6 +36,7 @@ apiRouter.post('/chat-stream', async (c) => {
       contents: content,
       config: {
         temperature: 1.2,
+        maxOutputTokens: 500,
       },
     });
     c.status(200);
