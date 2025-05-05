@@ -24,11 +24,53 @@ const Chat = () => {
     }
   };
 
+  const streamMessage = async (message: string, id: string) => {
+    try {
+      const response = await fetch('/api/chat-stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: message }),
+      });
+      if (!response.body || !response.ok) {
+        const error = (await response.json()) as { error: string };
+        throw new Error(`Network response was not ok since ${error.error}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          setFailedMessageId(undefined);
+          break;
+        }
+        const text = decoder.decode(value);
+        setMessages((prevMessages) => {
+          const lastMessage = prevMessages[prevMessages.length - 1];
+          if (lastMessage && lastMessage.id === id && lastMessage.role === 'assistant') {
+            return [
+              ...prevMessages.slice(0, -1),
+              { ...lastMessage, content: lastMessage.content + text },
+            ];
+          }
+          return [...prevMessages, { role: 'assistant', content: text, id: id }];
+        });
+      }
+    } catch (error) {
+      setFailedMessageId(id);
+      console.error('Error streaming chat message:', error);
+    }
+  };
+
   /**
    * Handles the POST and UI update when submitting the new input
-   * @param formData from the TextArea
+   * @param content of users input
+   * @param stream if the llm message should be streamed
+   * @param id of the message to update
    */
-  const updateMessage = async (content: string, id?: string) => {
+  const updateMessage = async (content: string, stream = true, id?: string) => {
     if (!content || waiting) return;
     let messageInput: Message | undefined;
     if (!id) {
@@ -46,6 +88,10 @@ const Chat = () => {
         return;
       }
     }
+    if (stream) {
+      await streamMessage(messageInput.content, id);
+      return;
+    }
     const timer: number = setTimeout(() => setWaiting(true), 300);
     const response: string | undefined = await sendMessage(messageInput.content, id);
     clearTimeout(timer);
@@ -60,6 +106,10 @@ const Chat = () => {
     setWaiting(false);
   };
 
+  const sendNewMessage = async (content: string) => {
+    await updateMessage(content);
+  };
+
   return (
     <div className="flex w-full flex-grow flex-col items-center justify-between space-y-2 p-4">
       <ConversationBox
@@ -68,7 +118,7 @@ const Chat = () => {
         failedMessageId={failedMessageId}
         reSendMessage={updateMessage}
       />
-      <InputBox submitFunc={updateMessage} />
+      <InputBox submitFunc={sendNewMessage} />
     </div>
   );
 };

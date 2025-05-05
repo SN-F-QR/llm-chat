@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { streamText } from 'hono/streaming';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 
@@ -22,6 +23,31 @@ apiRouter.post('/chat', async (c) => {
     return c.json({ content: response.text });
   } catch (error) {
     console.error('Error in /chat route:', error);
+    c.status(500);
+    return c.json({ error: 'Failed to chat with Gemini API' });
+  }
+});
+
+apiRouter.post('/chat-stream', async (c) => {
+  try {
+    const { content }: { content: string } = await c.req.json();
+    const response = await llm.models.generateContentStream({
+      model: 'gemini-2.0-flash',
+      contents: content,
+      config: {
+        temperature: 1.2,
+      },
+    });
+    c.status(200);
+    return streamText(c, async (stream) => {
+      for await (const chunk of response) {
+        if (chunk.text) {
+          await stream.write(chunk.text);
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error in /chat-stream route:', error);
     c.status(500);
     return c.json({ error: 'Failed to chat with Gemini API' });
   }

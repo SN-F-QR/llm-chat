@@ -6,7 +6,7 @@ const ConversationBox: React.FC<{
   messageList: Message[];
   waiting: boolean;
   failedMessageId: string | undefined;
-  reSendMessage: (message: string, id: string) => Promise<void>;
+  reSendMessage: (message: string, stream: boolean, id: string) => Promise<void>;
 }> = ({ messageList, waiting, failedMessageId, reSendMessage }) => {
   return (
     <div className="flex w-full max-w-3xl flex-col space-y-4 rounded-2xl p-4">
@@ -18,7 +18,7 @@ const ConversationBox: React.FC<{
               <TriangleAlert className="size-4 text-red-400" />
               <button
                 className="size-6 rounded-lg"
-                onClick={() => void reSendMessage(message.content, message.id)}
+                onClick={() => void reSendMessage(message.content, true, message.id)}
               >
                 <RotateCcw className="size-4 text-gray-500 transition-all duration-300 hover:text-gray-400" />
               </button>
