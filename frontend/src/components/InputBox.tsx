@@ -1,4 +1,4 @@
-import { SendHorizontal } from 'lucide-react';
+import { SendHorizontal, CircleStop } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 const InputBox: React.FC<{ submitFunc: (arg: string) => Promise<void> }> = ({ submitFunc }) => {
@@ -32,7 +32,7 @@ const InputBox: React.FC<{ submitFunc: (arg: string) => Promise<void> }> = ({ su
   };
 
   return (
-    <div className="w-full max-w-xl rounded-2xl border border-gray-200 p-4 shadow-sm">
+    <div className="w-full rounded-2xl border border-gray-200 bg-white p-4 shadow-lg shadow-purple-100">
       <div className="flex max-h-72 min-h-20 w-full flex-col justify-between overflow-hidden">
         <textarea
           ref={textAreaRef}
@@ -43,9 +43,17 @@ const InputBox: React.FC<{ submitFunc: (arg: string) => Promise<void> }> = ({ su
         ></textarea>
         <span className="flex items-center justify-between">
           <span></span>
-          <button onClick={() => void handleSubmit()} disabled={isSubmitting}>
-            <SendHorizontal className="size-8 cursor-pointer rounded-lg bg-purple-500 p-1 text-white" />
-          </button>
+          {isSubmitting ? (
+            <button onClick={() => console.log('User stopped generating')}>
+              <div className="overflow-hidden rounded-lg bg-purple-500">
+                <CircleStop className="size-8 p-1 text-white" />
+              </div>
+            </button>
+          ) : (
+            <button onClick={() => void handleSubmit()}>
+              <SendHorizontal className="size-8 cursor-pointer rounded-lg bg-purple-500 p-1 text-white" />
+            </button>
+          )}
         </span>
       </div>
     </div>

@@ -111,7 +111,7 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex w-full flex-grow flex-col items-center justify-between space-y-2 p-4">
+    <div className="relative flex w-full flex-grow flex-col items-center justify-between space-y-2 p-4 pb-36">
       <ConversationBox
         messageList={messages}
         waiting={waiting}
@@ -119,7 +119,9 @@ const Chat = () => {
         failedMessageId={failedMessageId}
         reSendMessage={updateMessage}
       />
-      <InputBox submitFunc={sendNewMessage} />
+      <div className="fixed bottom-4 w-full max-w-xl">
+        <InputBox submitFunc={sendNewMessage} />
+      </div>
     </div>
   );
 };
