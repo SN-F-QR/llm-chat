@@ -1,10 +1,13 @@
 import { SendHorizontal, CircleStop } from 'lucide-react';
 import { useRef, useState } from 'react';
 
-const InputBox: React.FC<{ submitFunc: (arg: string) => Promise<void> }> = ({ submitFunc }) => {
+const InputBox: React.FC<{
+  submitFunc: (arg: string, abort: AbortController) => Promise<void>;
+}> = ({ submitFunc }) => {
   const [text, setText] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const aborter = useRef<AbortController>(new AbortController());
 
   const handleTextInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -22,11 +25,12 @@ const InputBox: React.FC<{ submitFunc: (arg: string) => Promise<void> }> = ({ su
         textAreaRef.current.value = '';
         textAreaRef.current.style.height = 'auto';
       }
-      await submitFunc(text);
+      await submitFunc(text, aborter.current);
     } catch {
       console.error('Error submitting message:', text);
     } finally {
       setText('');
+      aborter.current = new AbortController();
       setIsSubmitting(false);
     }
   };
@@ -44,7 +48,12 @@ const InputBox: React.FC<{ submitFunc: (arg: string) => Promise<void> }> = ({ su
         <span className="flex items-center justify-between">
           <span></span>
           {isSubmitting ? (
-            <button onClick={() => console.log('User stopped generating')}>
+            <button
+              onClick={() => {
+                console.log('User stopped generating');
+                aborter.current.abort();
+              }}
+            >
               <div className="overflow-hidden rounded-lg bg-purple-500">
                 <CircleStop className="size-8 p-1 text-white" />
               </div>

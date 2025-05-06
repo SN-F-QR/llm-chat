@@ -24,14 +24,16 @@ const Chat = () => {
     }
   };
 
-  const streamMessage = async (message: string, id: string) => {
+  const streamMessage = async (message: string, id: string, abortController: AbortController) => {
     try {
+      setWaiting(true);
       const response = await fetch('/api/chat-stream', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ content: message }),
+        signal: abortController.signal,
       });
       if (!response.body || !response.ok) {
         const error = (await response.json()) as { error: string };
@@ -59,8 +61,14 @@ const Chat = () => {
         });
       }
     } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        console.log('User aborted streaming');
+        return;
+      }
       setFailedMessageId(id);
       console.error('Error streaming chat message:', error);
+    } finally {
+      setWaiting(false);
     }
   };
 
@@ -70,7 +78,12 @@ const Chat = () => {
    * @param stream if the llm message should be streamed
    * @param id of the message to update
    */
-  const updateMessage = async (content: string, stream = true, id?: string) => {
+  const updateMessage = async (
+    content: string,
+    abort: AbortController,
+    stream = true,
+    id?: string
+  ) => {
     if (!content || waiting) return;
     let messageInput: Message | undefined;
     if (!id) {
@@ -89,7 +102,7 @@ const Chat = () => {
       }
     }
     if (stream) {
-      await streamMessage(messageInput.content, id);
+      await streamMessage(messageInput.content, id, abort);
       return;
     }
     const timer: number = setTimeout(() => setWaiting(true), 300);
@@ -106,8 +119,8 @@ const Chat = () => {
     setWaiting(false);
   };
 
-  const sendNewMessage = async (content: string) => {
-    await updateMessage(content, true);
+  const sendNewMessage = async (content: string, abort: AbortController) => {
+    await updateMessage(content, abort, true);
   };
 
   return (
