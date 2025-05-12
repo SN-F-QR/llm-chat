@@ -13,5 +13,5 @@ Content-Type: application/json
 
 {
   "role": "user",
-  "content": "show me a short python script without explanation"
+  "content": "What is the bus waiting time paradox?"
 }

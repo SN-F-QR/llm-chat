@@ -22,7 +22,7 @@ const ConversationBox: React.FC<{
     stream: boolean,
     id: string
   ) => Promise<void>;
-}> = ({ messageList, waiting, streaming, failedMessageId, reSendMessage }) => {
+}> = ({ messageList, waiting, failedMessageId, reSendMessage }) => {
   const aborter = useRef<AbortController>(new AbortController());
 
   const messageHistory = messageList.map((message) => (
@@ -57,7 +57,7 @@ const ConversationBox: React.FC<{
   return (
     <div className="flex w-full max-w-3xl flex-col space-y-4 rounded-2xl p-4">
       {messageHistory}
-      {waiting && !streaming && <LoadingMessage />}
+      {/* {waiting && <LoadingMessage />} */}
     </div>
   );
 };
@@ -89,6 +89,8 @@ const MessageBuble: React.FC<{ message: Message; updating: boolean }> = ({ messa
         <div className="max-w-lg rounded-lg bg-purple-400 p-2 text-white">
           <p>{message.content}</p>
         </div>
+      ) : message.content === '' && updating ? (
+        <LoadingMessage />
       ) : (
         <div className="flex w-full">
           <div className="py-2">

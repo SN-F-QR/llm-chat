@@ -13,11 +13,10 @@ apiRouter.post('/chat', async (c) => {
   try {
     const { content }: { content: string } = await c.req.json();
     const response = await llm.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash-preview-04-17',
       contents: content,
       config: {
         temperature: 1.2,
-        maxOutputTokens: 200,
       },
     });
     return c.json({ content: response.text });
@@ -32,11 +31,10 @@ apiRouter.post('/chat-stream', async (c) => {
   try {
     const { content }: { content: string } = await c.req.json();
     const response = await llm.models.generateContentStream({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash-preview-04-17',
       contents: content,
       config: {
         temperature: 1.2,
-        maxOutputTokens: 500,
       },
     });
     c.status(200);

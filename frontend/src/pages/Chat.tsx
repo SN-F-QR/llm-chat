@@ -24,6 +24,27 @@ const Chat = () => {
     }
   };
 
+  const sendAndWaitMessage = async (message: string, id: string) => {
+    const timer: number = setTimeout(() => setWaiting(true), 300);
+    const response: string | undefined = await sendMessage(message, id);
+    clearTimeout(timer);
+    if (response) {
+      const llmMessage: Message = {
+        role: 'assistant',
+        content: response,
+        id: id,
+      };
+      setMessages((prevMessages) => {
+        const lastMessage = prevMessages[prevMessages.length - 1];
+        if (lastMessage && lastMessage.id === id && lastMessage.role === 'assistant') {
+          return [...prevMessages.slice(0, -1), llmMessage];
+        }
+        throw new Error('Message not found');
+      });
+    }
+    setWaiting(false);
+  };
+
   const streamMessage = async (message: string, id: string, abortController: AbortController) => {
     try {
       setWaiting(true);
@@ -57,10 +78,11 @@ const Chat = () => {
               { ...lastMessage, content: lastMessage.content + text },
             ];
           }
-          return [...prevMessages, { role: 'assistant', content: text, id: id }];
+          throw new Error('Message not found');
         });
       }
     } catch (error) {
+      setMessages((prevMessages) => [...prevMessages.slice(0, -1)]);
       if (error instanceof DOMException && error.name === 'AbortError') {
         console.log('User aborted streaming');
         return;
@@ -101,26 +123,16 @@ const Chat = () => {
         return;
       }
     }
+    setMessages((prevMessages) => [...prevMessages, { role: 'assistant', content: '', id: id }]);
     if (stream) {
       await streamMessage(messageInput.content, id, abort);
-      return;
+    } else {
+      await sendAndWaitMessage(messageInput.content, id);
     }
-    const timer: number = setTimeout(() => setWaiting(true), 300);
-    const response: string | undefined = await sendMessage(messageInput.content, id);
-    clearTimeout(timer);
-    if (response) {
-      const llmMessage: Message = {
-        role: 'assistant',
-        content: response,
-        id: id,
-      };
-      setMessages((prevMessages) => [...prevMessages, llmMessage]);
-    }
-    setWaiting(false);
   };
 
   const sendNewMessage = async (content: string, abort: AbortController) => {
-    await updateMessage(content, abort, true);
+    await updateMessage(content, abort, false);
   };
 
   return (
@@ -128,7 +140,7 @@ const Chat = () => {
       <ConversationBox
         messageList={messages}
         waiting={waiting}
-        streaming={true}
+        streaming={false}
         failedMessageId={failedMessageId}
         reSendMessage={updateMessage}
       />
