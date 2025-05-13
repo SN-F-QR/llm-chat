@@ -82,11 +82,18 @@ const Chat = () => {
         });
       }
     } catch (error) {
-      setMessages((prevMessages) => [...prevMessages.slice(0, -1)]);
       if (error instanceof DOMException && error.name === 'AbortError') {
+        setMessages((prevMessages) => {
+          const lastMessage = prevMessages[prevMessages.length - 1];
+          if (lastMessage.content === '') {
+            lastMessage.content = 'Aborted';
+          }
+          return [...prevMessages.slice(0, -1), lastMessage];
+        });
         console.log('User aborted streaming');
         return;
       }
+      setMessages((prevMessages) => [...prevMessages.slice(0, -1)]);
       setFailedMessageId(id);
       console.error('Error streaming chat message:', error);
     } finally {
@@ -132,7 +139,7 @@ const Chat = () => {
   };
 
   const sendNewMessage = async (content: string, abort: AbortController) => {
-    await updateMessage(content, abort, false);
+    await updateMessage(content, abort, true);
   };
 
   return (
@@ -140,7 +147,7 @@ const Chat = () => {
       <ConversationBox
         messageList={messages}
         waiting={waiting}
-        streaming={false}
+        streaming={true}
         failedMessageId={failedMessageId}
         reSendMessage={updateMessage}
       />
