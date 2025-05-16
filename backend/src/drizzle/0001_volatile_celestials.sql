@@ -1,0 +1,1 @@
+ALTER TABLE `user` ADD `money` real DEFAULT 0 NOT NULL;
