@@ -50,6 +50,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.14.1
         version: 1.14.1(hono@4.7.8)
+      '@hono/zod-validator':
+        specifier: ^0.5.0
+        version: 0.5.0(hono@4.7.8)(zod@3.24.4)
       bcryptjs:
         specifier: ^3.0.2
         version: 3.0.2
@@ -71,6 +74,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
+      zod:
+        specifier: ^3.24.4
+        version: 3.24.4
     devDependencies:
       '@types/bcryptjs':
         specifier: ^3.0.0
@@ -510,6 +516,12 @@ packages:
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
+
+  '@hono/zod-validator@0.5.0':
+    resolution: {integrity: sha512-ds5bW6DCgAnNHP33E3ieSbaZFd5dkV52ZjyaXtGoR06APFrCtzAsKZxTHwOrJNBdXsi0e5wNwo5L4nVEVnJUdg==}
+    peerDependencies:
+      hono: '>=3.9.0'
+      zod: ^3.19.1
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2974,6 +2986,11 @@ snapshots:
   '@hono/node-server@1.14.1(hono@4.7.8)':
     dependencies:
       hono: 4.7.8
+
+  '@hono/zod-validator@0.5.0(hono@4.7.8)(zod@3.24.4)':
+    dependencies:
+      hono: 4.7.8
+      zod: 3.24.4
 
   '@humanfs/core@0.19.1': {}
 

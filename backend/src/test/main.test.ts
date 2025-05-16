@@ -13,6 +13,8 @@ interface User {
 }
 
 describe('main test', () => {
+  let TOKEN: string; // JWT token for authentication
+
   test('should have a fetch method', () => {
     expect(app.fetch).toBeDefined();
   });
@@ -76,5 +78,47 @@ describe('main test', () => {
     expect(info.password).toBeUndefined();
     expect(info.lastRevokedTime).toBeUndefined();
     expect(token).toBeDefined();
+  });
+
+  test('POST /login', async () => {
+    const response = await app.request('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        stuNum: '20180321',
+        password: '123456789012345678',
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    expect(response.status).toBe(200);
+    const { info, token } = (await response.json()) as { info: User; token: string };
+    expect(info).toBe('Login successful');
+    expect(token).toBeDefined();
+    TOKEN = token;
+  });
+
+  describe.concurrent('auth test', () => {
+    test('GET /verify', async () => {
+      const response = await app.request('/api/auth/verify', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      });
+      expect(response.status).toBe(200);
+      const body = await response.text();
+      expect(body).toBe('Verify endpoint');
+    });
+
+    test('GET /verify with invalid token', async () => {
+      const response = await app.request('/api/auth/verify', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer invalid_token233',
+        },
+      });
+      expect(response.status).toBe(401);
+    });
   });
 });
