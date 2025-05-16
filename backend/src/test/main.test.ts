@@ -1,13 +1,24 @@
 import { describe, test, expect } from 'vitest';
 import app from '../index.js';
 
+interface User {
+  id: number;
+  name: string;
+  password: string | undefined;
+  money: number;
+  avatar: string;
+  stuNum: string;
+  department: string;
+  lastRevokedTime: number;
+}
+
 describe('main test', () => {
   test('should have a fetch method', () => {
     expect(app.fetch).toBeDefined();
   });
 
-  test('POST /api/chat', async () => {
-    const response = await app.request('/api/chat', {
+  test('POST /chat', async () => {
+    const response = await app.request('/api/llm/chat', {
       method: 'POST',
       body: JSON.stringify({ content: 'Hello, Gemini!' }),
       headers: {
@@ -20,10 +31,10 @@ describe('main test', () => {
     expect(body).toHaveProperty('content');
     expect(body.content).toBeTypeOf('string');
     expect(body.content.length).toBeGreaterThan(0);
-  });
+  }, 20_000);
 
-  test('POST /api/chat-stream', async () => {
-    const response = await app.request('/api/chat-stream', {
+  test('POST /chat-stream', async () => {
+    const response = await app.request('/api/llm/chat-stream', {
       method: 'POST',
       body: JSON.stringify({ content: 'Can you tell me a joke in 100 words?' }),
       headers: {
@@ -42,5 +53,28 @@ describe('main test', () => {
       const text = decoder.decode(value);
       expect(text.length).toBeGreaterThan(0);
     }
+  }, 20_000);
+
+  test('POST /user', async () => {
+    const response = await app.request('/api/user', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'test User',
+        password: '123456789012345678',
+        stuNum: '20180321',
+        department: 'Computer Science',
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    expect(response.status).toBe(201);
+    expect(response.headers.get('Content-Type')).toBe('application/json');
+    const { info, token } = (await response.json()) as { info: User; token: string };
+    expect(info).toBeDefined();
+    expect(info.id).toBeTypeOf('number');
+    expect(info.password).toBeUndefined();
+    expect(info.lastRevokedTime).toBeUndefined();
+    expect(token).toBeDefined();
   });
 });
