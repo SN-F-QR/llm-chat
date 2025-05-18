@@ -5,7 +5,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "tsx src/index.ts",
     "dev": "nodemon --watch src --exec ts-node src/index.ts",
     "build": "tsc",
     "test": "vitest",
@@ -26,6 +26,7 @@
     "drizzle-orm": "^0.43.1",
     "hono": "^4.7.8",
     "jsonwebtoken": "^9.0.2",
+    "tsx": "^4.19.4",
     "zod": "^3.24.4"
   },
   "devDependencies": {

@@ -29,5 +29,10 @@
     "globals": "^16.0.0",
     "prettier": "^3.5.3",
     "typescript-eslint": "^8.31.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3"
+    ]
   }
 }

@@ -12,7 +12,7 @@ const Chat = () => {
 
   const sendMessage = async (message: string, id: string) => {
     try {
-      const response = await axios.post<{ content: string }>('/api/chat', {
+      const response = await axios.post<{ content: string }>('/api/llm/chat', {
         content: message,
       });
       setFailedMessageId(undefined);
@@ -48,7 +48,7 @@ const Chat = () => {
   const streamMessage = async (message: string, id: string, abortController: AbortController) => {
     try {
       setWaiting(true);
-      const response = await fetch('/api/chat-stream', {
+      const response = await fetch('/api/llm/chat-stream', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -5,17 +5,18 @@ RUN corepack enable
 
 FROM base AS builder
 WORKDIR /app
-COPY frontend/package.json frontend/pnpm-lock.yaml ./frontend/
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --filter=frontend
-COPY . .
-RUN pnpm run build:frontend
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+# COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
+COPY frontend/ ./
+RUN pnpm build
 
 FROM base AS production
 WORKDIR /app/backend
-COPY --from=builder /app/frontend/dist ./static
-COPY --from=builder /app/backend/ ./
+COPY --from=builder /app/dist ./static
+COPY backend/package.json backend/pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
+COPY  backend/ ./
 EXPOSE 3001
 CMD [ "pnpm", "start" ]
 

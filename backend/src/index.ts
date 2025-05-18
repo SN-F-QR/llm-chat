@@ -12,7 +12,7 @@ import apiRouter from './api';
 
 const app = new Hono();
 const PORT: number = +(process.env.PORT ?? '3001');
-const staticPath = '../frontend/dist';
+const staticPath = './static';
 
 app.use(logger());
 app.use('api', cors());
