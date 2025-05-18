@@ -1,0 +1,11 @@
+services:
+  llmChat:
+    image: harunoqwq/llm-chat
+    container_name: llm-chat
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./db.sqlite:/app/db.sqlite
+    ports:
+      - '3001:3001'
