@@ -3,6 +3,7 @@ import db from '../database';
 import { eq } from 'drizzle-orm';
 import { userTable } from '../drizzle/schema';
 
+import { authMiddleware } from './authRouter';
 import { jwtOptions, saltRounds } from '../config';
 import bcrypt from 'bcryptjs';
 import { sign } from 'hono/jwt';
@@ -46,13 +47,28 @@ userRouter.post('/', async (c) => {
     jwtOptions.alg
   );
 
-  const returnUser = { ...newUser[0], password: undefined, lastRevokedTime: undefined };
+  const returnUser = {
+    ...newUser[0],
+    id: undefined,
+    password: undefined,
+    lastRevokedTime: undefined,
+  };
   c.status(201);
   return c.json({
     info: {
       ...returnUser,
     },
     token: token,
+  });
+});
+
+userRouter.get('/me', authMiddleware, (c) => {
+  const loginUser = c.get('user');
+  c.status(200);
+  return c.json({
+    ...loginUser,
+    id: undefined,
+    lastRevokedTime: undefined,
   });
 });
 

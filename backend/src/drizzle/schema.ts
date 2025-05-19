@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { sql, InferSelectModel } from 'drizzle-orm';
 import { sqliteTable, text, integer, real, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 export const userTable = sqliteTable(
@@ -15,3 +15,7 @@ export const userTable = sqliteTable(
   },
   (table) => [uniqueIndex('stu_num_idx').on(table.stuNum)]
 );
+
+type User = InferSelectModel<typeof userTable>;
+
+export { User };

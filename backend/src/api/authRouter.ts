@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { createMiddleware } from 'hono/factory';
 import db from '../database';
 import { eq } from 'drizzle-orm';
-import { userTable } from '../drizzle/schema';
+import { userTable, User } from '../drizzle/schema';
 
 import { jwtOptions } from '../config';
 import z from 'zod';
@@ -48,29 +48,29 @@ authRouter.post('/login', zValidator('json', loginSchema), async (c) => {
   });
 });
 
-const authMiddleware = createMiddleware<{ Variables: { user: { id: number; stuNum: string } } }>(
-  async (c, next) => {
-    const token = c.req.header('Authorization')?.split(' ')[1];
-    if (!token) {
-      throw new UnauthorizedError('No token provided');
-    }
-    const decoded = await verify(token, jwtOptions.secret, jwtOptions.alg);
-    console.log('Decoded token:', decoded);
-    if (!decoded?.iat || !decoded?.id) {
-      throw new UnauthorizedError('Invalid token');
-    }
-    const existingUser = await db.query.userTable.findFirst({
-      where: eq(userTable.id, decoded.id as number),
-    });
-    if (!existingUser || existingUser.lastRevokedTime > decoded.iat) {
-      console.log('Last revoked time:', existingUser?.lastRevokedTime, 'Decoded iat:', decoded.iat);
-      throw new UnauthorizedError('Revoked token');
-    }
-    // populate the context with user info
-    c.set('user', existingUser);
-    await next();
+export const authMiddleware = createMiddleware<{
+  Variables: { user: Omit<User, 'password'> };
+}>(async (c, next) => {
+  const token = c.req.header('Authorization')?.split(' ')[1];
+  if (!token) {
+    throw new UnauthorizedError('No token provided');
   }
-);
+  const decoded = await verify(token, jwtOptions.secret, jwtOptions.alg);
+  console.log('Decoded token:', decoded);
+  if (!decoded?.iat || !decoded?.id) {
+    throw new UnauthorizedError('Invalid token');
+  }
+  const existingUser = await db.query.userTable.findFirst({
+    where: eq(userTable.id, decoded.id as number),
+  });
+  if (!existingUser || existingUser.lastRevokedTime > decoded.iat) {
+    console.log('Last revoked time:', existingUser?.lastRevokedTime, 'Decoded iat:', decoded.iat);
+    throw new UnauthorizedError('Revoked token');
+  }
+  // populate the context with user info
+  c.set('user', existingUser);
+  await next();
+});
 
 authRouter.use('/verify', authMiddleware);
 
