@@ -1,35 +1,22 @@
-// import { useEffect, useState } from 'react';
-// import axios from 'axios';
-
-import NavBar from '../components/NavBar';
+import Dashboard from './Dashboard';
+import Login from './Login';
 import Chat from './Chat';
+import { BrowserRouter, Routes, Route } from 'react-router';
 
 const App = () => {
-  // const [message, setMessage] = useState<string>('');
-
-  // useEffect(() => {
-  //   const testGet = async () => {
-  //     try {
-  //       const res = await axios.get<{ message: string }>('/api');
-  //       setMessage(res.data.message);
-  //     } catch (error) {
-  //       console.error('Error fetching message:', error);
-  //     }
-  //   };
-  //   void testGet();
-  // }, []);
-
   return (
-    <div className="flex min-h-dvh w-full flex-col overflow-auto">
-      <div className="relative flex w-full flex-grow flex-col">
-        <NavBar />
-        {/* <div className="flex items-center justify-between p-4">
-        <h1 className="text-xl text-pink-500">Welcome to the LLM chat</h1>
-        <p className="">Server status: {message}</p>
-      </div> */}
-        <Chat />
+    <BrowserRouter>
+      <div className="flex min-h-dvh w-full flex-col overflow-auto">
+        <div className="flex w-full flex-grow flex-col">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Dashboard />}>
+              <Route index element={<Chat />} />
+            </Route>
+          </Routes>
+        </div>
       </div>
-    </div>
+    </BrowserRouter>
   );
 };
 
