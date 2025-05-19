@@ -48,32 +48,44 @@ authRouter.post('/login', zValidator('json', loginSchema), async (c) => {
   });
 });
 
-const authMiddleware = createMiddleware(async (c, next) => {
-  const token = c.req.header('Authorization')?.split(' ')[1];
-  if (!token) {
-    throw new UnauthorizedError('No token provided');
+const authMiddleware = createMiddleware<{ Variables: { user: { id: number; stuNum: string } } }>(
+  async (c, next) => {
+    const token = c.req.header('Authorization')?.split(' ')[1];
+    if (!token) {
+      throw new UnauthorizedError('No token provided');
+    }
+    const decoded = await verify(token, jwtOptions.secret, jwtOptions.alg);
+    console.log('Decoded token:', decoded);
+    if (!decoded?.iat || !decoded?.id) {
+      throw new UnauthorizedError('Invalid token');
+    }
+    const existingUser = await db.query.userTable.findFirst({
+      where: eq(userTable.id, decoded.id as number),
+    });
+    if (!existingUser || existingUser.lastRevokedTime > decoded.iat) {
+      console.log('Last revoked time:', existingUser?.lastRevokedTime, 'Decoded iat:', decoded.iat);
+      throw new UnauthorizedError('Revoked token');
+    }
+    // populate the context with user info
+    c.set('user', existingUser);
+    await next();
   }
-  const decoded = await verify(token, jwtOptions.secret, jwtOptions.alg);
-  console.log('Decoded token:', decoded);
-  if (!decoded?.iat || !decoded?.id) {
-    throw new UnauthorizedError('Invalid token');
-  }
-  const existingUser = await db.query.userTable.findFirst({
-    where: eq(userTable.id, decoded.id as number),
-  });
-  if (!existingUser || existingUser.lastRevokedTime > decoded.iat) {
-    console.log('Last revoked time:', existingUser?.lastRevokedTime, 'Decoded iat:', decoded.iat);
-    throw new UnauthorizedError('Revoked token');
-  }
-  // populate the context with user info
-  c.set('user', existingUser);
-  await next();
-});
+);
 
 authRouter.use('/verify', authMiddleware);
 
 authRouter.get('/verify', (c) => {
   return c.text('Verify endpoint');
+});
+
+authRouter.get('/logout', authMiddleware, async (c) => {
+  const { stuNum } = c.get('user');
+  await db
+    .update(userTable)
+    .set({ lastRevokedTime: Math.floor(Date.now() / 1000) })
+    .where(eq(userTable.stuNum, stuNum));
+  c.status(200);
+  return c.text('Logout successful');
 });
 
 export default authRouter;
