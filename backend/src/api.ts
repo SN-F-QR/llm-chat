@@ -6,7 +6,7 @@ import authRouter from './api/authRouter';
 import ConflictError from './error/ConflictError';
 import NotFoundError from './error/NotFoundError';
 import UnauthorizedError from './error/UnauthorizedError';
-import { JwtTokenInvalid } from 'hono/utils/jwt/types';
+import { JwtTokenInvalid, JwtTokenExpired } from 'hono/utils/jwt/types';
 
 const apiRouter = new Hono();
 
@@ -22,7 +22,7 @@ apiRouter.onError((err, c) => {
   ) {
     c.status(err.statusCode);
     return c.text(err.message);
-  } else if (err instanceof JwtTokenInvalid) {
+  } else if (err instanceof JwtTokenInvalid || err instanceof JwtTokenExpired) {
     c.status(401);
     return c.text('Invalid token');
   } else {

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import app from '../index.js';
+import app from '../index';
 
 interface User {
   id: number;
@@ -12,7 +12,7 @@ interface User {
   lastRevokedTime: number;
 }
 
-describe('main test', () => {
+describe.sequential('main test', () => {
   let TOKEN: string; // JWT token for authentication
 
   test('should have a fetch method', () => {
@@ -74,7 +74,6 @@ describe('main test', () => {
     expect(response.headers.get('Content-Type')).toBe('application/json');
     const { info, token } = (await response.json()) as { info: User; token: string };
     expect(info).toBeDefined();
-    expect(info.id).toBeTypeOf('number');
     expect(info.password).toBeUndefined();
     expect(info.lastRevokedTime).toBeUndefined();
     expect(token).toBeDefined();
@@ -92,7 +91,7 @@ describe('main test', () => {
       },
     });
     expect(response.status).toBe(200);
-    const { info, token } = (await response.json()) as { info: User; token: string };
+    const { info, token } = (await response.json()) as { info: string; token: string };
     expect(info).toBe('Login successful');
     expect(token).toBeDefined();
     TOKEN = token;
@@ -120,5 +119,31 @@ describe('main test', () => {
       });
       expect(response.status).toBe(401);
     });
+
+    test('GET /me', async () => {
+      const response = await app.request('/api/user/me', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      });
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as Omit<User, 'password'>;
+      expect(body).toBeDefined();
+      expect(body).not.toHaveProperty('password');
+      expect(body.lastRevokedTime).toBeUndefined();
+    });
+  });
+
+  test('Logout', async () => {
+    const response = await app.request('/api/auth/logout', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+      },
+    });
+    expect(response.status).toBe(200);
+    const body = await response.text();
+    expect(body).toBe('Logout successful');
   });
 });

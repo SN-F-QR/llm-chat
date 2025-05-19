@@ -65,10 +65,10 @@ userRouter.post('/', async (c) => {
 userRouter.get('/me', authMiddleware, (c) => {
   const loginUser = c.get('user');
   c.status(200);
+  const { id, lastRevokedTime, ...returnUser } = loginUser;
   return c.json({
-    ...loginUser,
-    id: undefined,
-    lastRevokedTime: undefined,
+    ...returnUser,
+    password: undefined,
   });
 });
 
