@@ -19,44 +19,6 @@ describe.sequential('main test', () => {
     expect(app.fetch).toBeDefined();
   });
 
-  test('POST /chat', async () => {
-    const response = await app.request('/api/llm/chat', {
-      method: 'POST',
-      body: JSON.stringify({ content: 'Hello, Gemini!' }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    expect(response.status).toBe(200);
-    expect(response.headers.get('Content-Type')).toBe('application/json');
-    const body = (await response.json()) as { content: string };
-    expect(body).toHaveProperty('content');
-    expect(body.content).toBeTypeOf('string');
-    expect(body.content.length).toBeGreaterThan(0);
-  }, 20_000);
-
-  test('POST /chat-stream', async () => {
-    const response = await app.request('/api/llm/chat-stream', {
-      method: 'POST',
-      body: JSON.stringify({ content: 'Can you tell me a joke in 100 words?' }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    expect(response.status).toBe(200);
-    expect(response.body).not.toBeNull();
-    const reader = response.body!.getReader();
-    const decoder = new TextDecoder();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        break;
-      }
-      const text = decoder.decode(value);
-      expect(text.length).toBeGreaterThan(0);
-    }
-  }, 20_000);
-
   test('POST /user', async () => {
     const response = await app.request('/api/user', {
       method: 'POST',
@@ -119,6 +81,46 @@ describe.sequential('main test', () => {
       });
       expect(response.status).toBe(401);
     });
+
+    test('POST /chat', async () => {
+      const response = await app.request('/api/llm/chat', {
+        method: 'POST',
+        body: JSON.stringify({ content: 'Hello, Gemini!' }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      });
+      expect(response.status).toBe(200);
+      expect(response.headers.get('Content-Type')).toBe('application/json');
+      const body = (await response.json()) as { content: string };
+      expect(body).toHaveProperty('content');
+      expect(body.content).toBeTypeOf('string');
+      expect(body.content.length).toBeGreaterThan(0);
+    }, 20_000);
+
+    test('POST /chat-stream', async () => {
+      const response = await app.request('/api/llm/chat-stream', {
+        method: 'POST',
+        body: JSON.stringify({ content: 'Can you tell me a joke in 100 words?' }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      });
+      expect(response.status).toBe(200);
+      expect(response.body).not.toBeNull();
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+        const text = decoder.decode(value);
+        expect(text.length).toBeGreaterThan(0);
+      }
+    }, 20_000);
 
     test('GET /me', async () => {
       const response = await app.request('/api/user/me', {
