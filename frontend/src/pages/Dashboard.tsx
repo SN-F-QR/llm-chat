@@ -3,15 +3,6 @@ import { Outlet, useNavigate } from 'react-router';
 import NavBar from '../components/NavBar';
 
 const Dashboard = () => {
-  return (
-    <div className="relative w-full">
-      <NavBar />
-      <ProtectedRoute />
-    </div>
-  );
-};
-
-const ProtectedRoute = () => {
   const navigate = useNavigate();
   const [isAuth, setIsAuth] = useState<boolean>(false);
   useEffect(() => {
@@ -21,15 +12,20 @@ const ProtectedRoute = () => {
     setIsAuth(true);
   }, []);
 
-  if (isAuth) {
-    return <Outlet />;
-  } else {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <p className="text-2xl font-bold">Loading...</p>
-      </div>
-    );
-  }
+  return (
+    <div className="relative w-full">
+      <NavBar isAuth={isAuth} />
+      {isAuth ? <Outlet /> : <ProtectedRoute />}
+    </div>
+  );
+};
+
+const ProtectedRoute = () => {
+  return (
+    <div className="flex h-screen w-full items-center justify-center">
+      <p className="text-2xl font-bold">Loading...</p>
+    </div>
+  );
 };
 
 export default Dashboard;
