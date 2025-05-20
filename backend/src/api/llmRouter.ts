@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { authMiddleware } from './authRouter';
 import { streamText } from 'hono/streaming';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
@@ -9,7 +10,7 @@ const llmRouter = new Hono();
 
 const llm = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
-llmRouter.post('/chat', async (c) => {
+llmRouter.post('/chat', authMiddleware, async (c) => {
   try {
     const { content }: { content: string } = await c.req.json();
     const response = await llm.models.generateContent({
@@ -27,7 +28,7 @@ llmRouter.post('/chat', async (c) => {
   }
 });
 
-llmRouter.post('/chat-stream', async (c) => {
+llmRouter.post('/chat-stream', authMiddleware, async (c) => {
   try {
     const { content }: { content: string } = await c.req.json();
     const response = await llm.models.generateContentStream({

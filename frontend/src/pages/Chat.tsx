@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import reqClient from '../service/requestClient';
 import { Message } from '../types/types';
 
 import InputBox from '../components/InputBox';
@@ -12,7 +12,7 @@ const Chat = () => {
 
   const sendMessage = async (message: string, id: string) => {
     try {
-      const response = await axios.post<{ content: string }>('/api/llm/chat', {
+      const response = await reqClient.client.post<{ content: string }>('/llm/chat', {
         content: message,
       });
       setFailedMessageId(undefined);
@@ -52,13 +52,14 @@ const Chat = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({ content: message }),
         signal: abortController.signal,
       });
       if (!response.body || !response.ok) {
-        const error = (await response.json()) as { error: string };
-        throw new Error(`Network response was not ok since ${error.error}`);
+        const error = await response.text();
+        throw new Error(error);
       }
 
       const reader = response.body.getReader();
