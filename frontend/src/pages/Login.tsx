@@ -75,13 +75,15 @@ const FormInput: React.FC<{ children: ReactNode; name: string; placeholder: stri
   name,
   placeholder,
 }) => {
+  const formType = name === 'password' ? 'password' : 'text';
+
   return (
     <label className="flex items-center px-4 py-2" htmlFor={name}>
       {children}
       <input
         id={name}
         className="ml-2 rounded-2xl border border-gray-200 bg-gray-50 p-2 shadow-md focus:border-purple-400 focus:ring-1 focus:ring-purple-400 focus:outline-none sm:min-w-72"
-        type="text"
+        type={formType}
         name={name}
         placeholder={placeholder}
       />
