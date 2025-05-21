@@ -41,7 +41,7 @@ const Login = () => {
   return (
     <div className="min-h-dvh max-w-xl place-content-center self-center p-4">
       <div className="items-center rounded-xl border border-gray-200 px-8 py-8 shadow sm:flex">
-        <div className="mr-8 flex place-content-center">
+        <div className="flex place-content-center sm:mr-8">
           <img className="size-24 object-cover p-2" src="/logo.jpeg" />
         </div>
         {/*Login input field */}
@@ -63,27 +63,34 @@ const Login = () => {
               Login
             </button>
           </form>
-          <button className="text-md cursor-pointer">Sign up</button>
+          <button
+            className="cursor-pointer text-sm hover:underline"
+            onClick={() => void navigate('/signup')}
+          >
+            Sign up
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-const FormInput: React.FC<{ children: ReactNode; name: string; placeholder: string }> = ({
+export const FormInput: React.FC<{ children: ReactNode; name: string; placeholder: string }> = ({
   children,
   name,
   placeholder,
 }) => {
   const formType = name === 'password' ? 'password' : 'text';
+  const autoComplete = name === 'password' ? 'current-password' : 'on';
 
   return (
-    <label className="flex items-center px-4 py-2" htmlFor={name}>
+    <label className="flex w-full items-center px-4 py-2" htmlFor={name}>
       {children}
       <input
         id={name}
         className="ml-2 rounded-2xl border border-gray-200 bg-gray-50 p-2 shadow-md focus:border-purple-400 focus:ring-1 focus:ring-purple-400 focus:outline-none sm:min-w-72"
         type={formType}
+        autoComplete={autoComplete}
         name={name}
         placeholder={placeholder}
       />

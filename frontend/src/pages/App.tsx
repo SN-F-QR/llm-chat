@@ -1,5 +1,6 @@
 import Dashboard from './Dashboard';
 import Login from './Login';
+import SignUp from './Signup';
 import Chat from './Chat';
 import { BrowserRouter, Routes, Route } from 'react-router';
 
@@ -10,6 +11,7 @@ const App = () => {
         <div className="flex w-full flex-grow flex-col">
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
             <Route path="/" element={<Dashboard />}>
               <Route index element={<Chat />} />
             </Route>

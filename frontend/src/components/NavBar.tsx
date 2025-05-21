@@ -1,14 +1,7 @@
 import { useEffect, useState } from 'react';
 import { LogOut } from 'lucide-react';
 import reqClient from '../service/requestClient';
-
-interface IUser {
-  name: string;
-  stuNum: string;
-  department: string;
-  money: number;
-  avatar: string | null;
-}
+import { IUser } from '../types/types';
 
 const NavBar: React.FC<{ isAuth: boolean }> = ({ isAuth }) => {
   const [user, setUser] = useState<IUser | undefined>(undefined);
