@@ -21,11 +21,7 @@ const Dashboard = () => {
 };
 
 const ProtectedRoute = () => {
-  return (
-    <div className="flex h-screen w-full items-center justify-center">
-      <p className="text-2xl font-bold">Loading...</p>
-    </div>
-  );
+  return <div className="flex h-screen w-full items-center justify-center"></div>;
 };
 
 export default Dashboard;
