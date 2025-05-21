@@ -65,7 +65,7 @@ const Login = () => {
           </form>
           <button
             className="cursor-pointer text-sm hover:underline"
-            onClick={() => void navigate('/signup')}
+            onClick={() => void navigate('/auth/signup')}
           >
             Sign up
           </button>

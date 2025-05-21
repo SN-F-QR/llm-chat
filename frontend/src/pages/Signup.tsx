@@ -73,7 +73,7 @@ const SignUp = () => {
             <p className="mr-2">Already have an account?</p>
             <button
               className="text-md cursor-pointer text-purple-400 hover:underline"
-              onClick={() => void navigate('/login')}
+              onClick={() => void navigate('/auth')}
             >
               Log in
             </button>

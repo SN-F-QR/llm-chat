@@ -38,7 +38,7 @@ const NavBar: React.FC<{ isAuth: boolean }> = ({ isAuth }) => {
       <div className="flex h-12 w-full items-center justify-between overflow-hidden border-b border-gray-200 bg-white p-4 shadow-sm">
         <span className="flex items-center space-x-2">
           <img className="size-8 rounded-full" src="/logo.jpeg" alt="Logo" />
-          <h1 className="text-lg font-semibold">LLM Chat</h1>
+          <h1 className="cursor-default text-lg font-semibold">LLM Chat</h1>
         </span>
         <span
           className="flex items-center space-x-2"

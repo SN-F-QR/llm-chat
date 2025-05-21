@@ -7,7 +7,7 @@ const Dashboard = () => {
   const [isAuth, setIsAuth] = useState<boolean>(false);
   useEffect(() => {
     if (!localStorage.getItem('token')) {
-      void navigate('/login');
+      void navigate('/auth');
     }
     setIsAuth(true);
   }, []);
