@@ -43,14 +43,23 @@ const InputForm: React.FC<FormInputProps> = ({
   );
 };
 
-export const FormItem: React.FC<{ children: ReactNode; name: string; placeholder: string }> = ({
-  children,
-  name,
-  placeholder,
-}) => {
+export const FormItem: React.FC<{
+  children: ReactNode;
+  name: string;
+  placeholder: string;
+  displayValue?: string;
+  onChange?: (action: { type: string; value: string }) => void;
+}> = ({ children, name, placeholder, displayValue, onChange }) => {
   const isPassword = name.includes('password');
   const formType = isPassword ? 'password' : 'text';
   const autoComplete = isPassword ? 'current-password' : 'on';
+
+  const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    if (onChange) {
+      onChange({ type: name, value });
+    }
+  };
 
   return (
     <label className="flex w-full items-center px-4 py-2" htmlFor={name}>
@@ -59,9 +68,11 @@ export const FormItem: React.FC<{ children: ReactNode; name: string; placeholder
         id={name}
         className="ml-2 rounded-2xl border border-gray-200 bg-gray-50 p-2 shadow-md focus:border-purple-400 focus:ring-1 focus:ring-purple-400 focus:outline-none sm:min-w-72"
         type={formType}
+        value={displayValue}
         autoComplete={autoComplete}
         name={name}
         placeholder={placeholder}
+        onChange={handleTextChange}
       />
     </label>
   );

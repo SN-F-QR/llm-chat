@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useReducer } from 'react';
 import reqClient from '../service/requestClient';
 import InputForm, { FormItem } from '../components/InputForm';
 import { IUser } from '../types/types';
@@ -9,37 +9,49 @@ const SignUp = () => {
   const navigate = useNavigate();
   const [invalidMessage, setInvalidMessage] = useState<string>('');
 
+  const initForm = {
+    name: '',
+    password: '',
+    password2: '',
+    stuNum: '',
+  };
+
+  const formReducer = (state: typeof initForm, action: { type: string; value: string }) => {
+    switch (action.type) {
+      case 'name':
+        return { ...state, name: action.value };
+      case 'password':
+        return { ...state, password: action.value };
+      case 'password2':
+        return { ...state, password2: action.value };
+      case 'stuNum':
+        return { ...state, stuNum: action.value };
+      default:
+        throw new TypeError('Invalid action type to update form');
+    }
+  };
+
+  const [formState, dispatch] = useReducer(formReducer, initForm);
+
   const handleSignUp = async (data: FormData) => {
-    const name = data.get('name');
-    const password = data.get('password');
-    const password2 = data.get('password2');
-    const stuNum = data.get('stuNum');
-    if (
-      typeof name === 'string' &&
-      typeof password === 'string' &&
-      typeof password2 === 'string' &&
-      typeof stuNum === 'string'
-    ) {
-      if (name.length < 5) {
-        setInvalidMessage('Name must be at least 5 characters');
-        return;
-      }
-      if (password.length < 8) {
-        setInvalidMessage('Password must be at least 8 characters');
-        return;
-      }
-      if (password !== password2) {
-        setInvalidMessage('Passwords do not match');
-        return;
-      }
-      if (stuNum.length !== 8) {
-        setInvalidMessage('Student number must be 8 digits');
-        return;
-      }
-    } else {
-      setInvalidMessage('Invalid input');
+    const { name, password, password2, stuNum } = formState;
+    if (name.length < 5) {
+      setInvalidMessage('Name must be at least 5 characters');
       return;
     }
+    if (password.length < 8) {
+      setInvalidMessage('Password must be at least 8 characters');
+      return;
+    }
+    if (password !== password2) {
+      setInvalidMessage('Passwords do not match');
+      return;
+    }
+    if (stuNum.length !== 8) {
+      setInvalidMessage('Student number must be 8 digits');
+      return;
+    }
+
     try {
       const response = await reqClient.client.post<{ info: IUser; token: string }>('/user', {
         name: name,
@@ -80,16 +92,36 @@ const SignUp = () => {
           </div>
         }
       >
-        <FormItem name="name" placeholder="Your full name">
+        <FormItem
+          name="name"
+          placeholder="Your full name"
+          displayValue={formState.name}
+          onChange={dispatch}
+        >
           <p className="mr-2 flex-grow">Name</p>
         </FormItem>
-        <FormItem name="password" placeholder="Your password">
+        <FormItem
+          name="password"
+          placeholder="Your password"
+          displayValue={formState.password}
+          onChange={dispatch}
+        >
           <p className="mr-2 flex-grow">Password</p>
         </FormItem>
-        <FormItem name="password2" placeholder="Confirm your password">
+        <FormItem
+          name="password2"
+          placeholder="Confirm your password"
+          displayValue={formState.password2}
+          onChange={dispatch}
+        >
           <p className="mr-2 flex-grow"></p>
         </FormItem>
-        <FormItem name="stuNum" placeholder="Your student number">
+        <FormItem
+          name="stuNum"
+          placeholder="Your student number"
+          displayValue={formState.stuNum}
+          onChange={dispatch}
+        >
           <p className="mr-2 flex-grow">Student Number</p>
         </FormItem>
         <label className="w-full items-center px-4 py-2">

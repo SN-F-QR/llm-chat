@@ -1,5 +1,5 @@
 import { User, Key } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useReducer } from 'react';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
 import reqClient from '../service/requestClient';
@@ -8,34 +8,48 @@ import InputForm, { FormItem } from '../components/InputForm';
 const Login = () => {
   const navigate = useNavigate();
   const [invalidMessage, setInvalidMessage] = useState<string>('');
-  const handleLogin = async (data: FormData) => {
-    const stuNum = data.get('stuNum');
-    const password = data.get('password');
-    if (typeof stuNum === 'string' && typeof password === 'string') {
-      if (stuNum.length !== 8) {
-        setInvalidMessage('Student number must be 8 digits');
-        return;
-      }
-      if (password.length < 8) {
-        setInvalidMessage('Password must be at least 8 characters');
-        return;
-      }
 
-      try {
-        const state = await reqClient.login(stuNum, password);
-        if (state) {
-          void navigate('/');
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          const errorMessage = `${error.response?.statusText}:${error.response?.data}`;
-          console.error('Error logging in:', errorMessage);
-          setInvalidMessage(errorMessage);
-        }
-      }
-    } else {
-      setInvalidMessage('Invalid input');
+  const initLoginForm = {
+    stuNum: '',
+    password: '',
+  };
+  const loginFormReducer = (
+    state: typeof initLoginForm,
+    action: { type: string; value: string }
+  ) => {
+    switch (action.type) {
+      case 'stuNum':
+        return { ...state, stuNum: action.value };
+      case 'password':
+        return { ...state, password: action.value };
+      default:
+        throw new TypeError('Invalid action type to update form');
+    }
+  };
+  const [loginFormState, dispatch] = useReducer(loginFormReducer, initLoginForm);
+
+  const handleLogin = async () => {
+    const { stuNum, password } = loginFormState;
+    if (stuNum.length !== 8) {
+      setInvalidMessage('Student number must be 8 digits');
       return;
+    }
+    if (password.length < 8) {
+      setInvalidMessage('Password must be at least 8 characters');
+      return;
+    }
+
+    try {
+      const state = await reqClient.login(stuNum, password);
+      if (state) {
+        void navigate('/');
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data as string;
+        console.error('Error logging in:', errorMessage);
+        setInvalidMessage(errorMessage);
+      }
     }
   };
 
@@ -58,14 +72,22 @@ const Login = () => {
           </span>
         }
       >
-        <FormItem name="stuNum" placeholder="student number">
+        <FormItem
+          name="stuNum"
+          placeholder="student number"
+          displayValue={loginFormState.stuNum}
+          onChange={dispatch}
+        >
           <User className="mr-2 size-6" />
         </FormItem>
-        <FormItem name="password" placeholder="password">
+        <FormItem
+          name="password"
+          placeholder="password"
+          displayValue={loginFormState.password}
+          onChange={dispatch}
+        >
           <Key className="mr-2 size-6" />
         </FormItem>
-
-        {invalidMessage.length > 0 && <p className="text-sm text-pink-500">{invalidMessage}</p>}
       </InputForm>
     </div>
   );
