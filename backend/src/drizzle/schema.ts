@@ -35,7 +35,7 @@ export const chatTable = sqliteTable(
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
     title: text('title').notNull(),
-    number: integer('number').default(0).notNull(),
+    publicId: text('publicId').notNull(),
     ownerId: integer('ownerId')
       .notNull()
       .references(() => userTable.id),
@@ -46,7 +46,7 @@ export const chatTable = sqliteTable(
       .default(sql`(unixepoch())`) // time since 1970 without ms
       .notNull(),
   },
-  (table) => [index('number_idx').on(table.number)]
+  (table) => [index('public_id_idx').on(table.publicId)]
 );
 
 export const messageTable = sqliteTable('message', {
