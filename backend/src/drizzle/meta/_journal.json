@@ -15,6 +15,13 @@
       "when": 1747388529843,
       "tag": "0001_volatile_celestials",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1747991261647,
+      "tag": "0002_slow_norrin_radd",
+      "breakpoints": true
     }
   ]
 }
