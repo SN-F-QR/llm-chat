@@ -9,7 +9,7 @@ CREATE TABLE `__new_chat` (
 	FOREIGN KEY (`ownerId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-INSERT INTO `__new_chat`("id", "title", "publicId", "ownerId", "createdAt", "lastUseAt") SELECT "id", "title", "publicId", "ownerId", "createdAt", "lastUseAt" FROM `chat`;--> statement-breakpoint
+INSERT INTO `__new_chat`("id", "title", "publicId", "ownerId", "createdAt", "lastUseAt") SELECT "id", "title", "number", "ownerId", "createdAt", "lastUseAt" FROM `chat`;--> statement-breakpoint
 DROP TABLE `chat`;--> statement-breakpoint
 ALTER TABLE `__new_chat` RENAME TO `chat`;--> statement-breakpoint
 PRAGMA foreign_keys=ON;--> statement-breakpoint
