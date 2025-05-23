@@ -56,7 +56,9 @@ export const messageTable = sqliteTable('message', {
     .references(() => chatTable.id),
   role: integer('role').notNull(),
   content: text('content').notNull(),
-  createdAt: integer('createdAt').default(Date.now()).notNull(),
+  createdAt: integer('createdAt')
+    .default(sql`(unixepoch())`)
+    .notNull(),
 });
 
 export const tagTable = sqliteTable('tag', {

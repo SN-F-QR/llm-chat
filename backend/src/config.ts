@@ -15,4 +15,9 @@ const jwtOptions = {
   expTime: 31 * 24 * 60 * 60,
 };
 
-export { jwtOptions, saltRounds };
+const googleApiKey = process.env.GOOGLE_API_KEY;
+if (!googleApiKey) {
+  throw new Error('GOOGLE_API_KEY is not defined');
+}
+
+export { jwtOptions, saltRounds, googleApiKey };

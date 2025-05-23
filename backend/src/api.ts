@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import llmRouter from './api/llmRouter';
 import userRouter from './api/userRouter';
 import authRouter from './api/authRouter';
+import chatRouter from './api/chatRouter';
 
 import ConflictError from './error/ConflictError';
 import NotFoundError from './error/NotFoundError';
@@ -13,6 +14,7 @@ const apiRouter = new Hono();
 apiRouter.route('/llm', llmRouter);
 apiRouter.route('/user', userRouter);
 apiRouter.route('/auth', authRouter);
+apiRouter.route('/chat', chatRouter);
 
 apiRouter.onError((err, c) => {
   if (
