@@ -56,12 +56,24 @@ GET http://localhost:3001/api/user/me HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ4MDA5MDQ4LCJleHAiOjE3NTA2ODc0NDh9.gYgGNH5d4ZuJZxvFmY-gW-_AaP2iukbh-v9SOwI3Qjs
 
-### 
+### Create a new chat with a new message
 
 POST http://localhost:3001/api/chat HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ4MDA5MDQ4LCJleHAiOjE3NTA2ODc0NDh9.gYgGNH5d4ZuJZxvFmY-gW-_AaP2iukbh-v9SOwI3Qjs
 
 {
-  "content": "What is the advantage of useCallback in React?"
+  "content": "What is the advantage of useMemo in React?"
 }
+
+### Get all chat records
+
+GET http://localhost:3001/api/chat HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ4MDA5MDQ4LCJleHAiOjE3NTA2ODc0NDh9.gYgGNH5d4ZuJZxvFmY-gW-_AaP2iukbh-v9SOwI3Qjs
+
+### Get messages in a specific chat
+
+GET http://localhost:3001/api/chat/VdVF2Jm3287Wh6mmblCYn HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ4MDA5MDQ4LCJleHAiOjE3NTA2ODc0NDh9.gYgGNH5d4ZuJZxvFmY-gW-_AaP2iukbh-v9SOwI3Qjs

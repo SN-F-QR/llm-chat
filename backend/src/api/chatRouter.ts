@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import db from '../database';
 import { eq, and } from 'drizzle-orm';
-import { chatTable, messageTable, Role } from '../drizzle/schema';
+import { chatTable, messageTable, Role, userTable } from '../drizzle/schema';
 import { authMiddleware } from './authRouter';
 import { nanoid } from 'nanoid';
 
@@ -66,6 +66,36 @@ chatRouter.post('/', authMiddleware, async (c) => {
   return c.json({
     ...newChat[0],
     id: undefined,
+  });
+});
+
+chatRouter.get('/', authMiddleware, async (c) => {
+  const { id } = c.get('user');
+  const chatAndTag = await db.query.userTable.findFirst({
+    where: eq(userTable.id, id),
+    with: {
+      chats: {
+        columns: {
+          ownerId: false,
+          id: false,
+        },
+      },
+      tags: {
+        columns: {
+          ownerId: false,
+        },
+      },
+    },
+  });
+
+  if (!chatAndTag) {
+    throw new NotFoundError('User not exist');
+  }
+  const { chats, tags } = chatAndTag;
+  c.status(200);
+  return c.json({
+    chats: chats,
+    tags: tags,
   });
 });
 
