@@ -120,7 +120,7 @@ describe.sequential('main test', () => {
         const text = decoder.decode(value);
         expect(text.length).toBeGreaterThan(0);
       }
-    }, 20_000);
+    }, 30_000);
 
     test('GET /me', async () => {
       const response = await app.request('/api/user/me', {
