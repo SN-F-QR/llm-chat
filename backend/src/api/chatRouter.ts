@@ -1,17 +1,30 @@
 import { Hono } from 'hono';
+import { streamText } from 'hono/streaming';
+
 import db from '../database';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { chatTable, messageTable, Role, userTable } from '../drizzle/schema';
 import { authMiddleware } from './authRouter';
 import { nanoid } from 'nanoid';
+import { zValidator } from '@hono/zod-validator';
+import z from 'zod';
 
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, FinishReason } from '@google/genai';
 import { googleApiKey } from '../config';
 
 import NotFoundError from '../error/NotFoundError';
 
 const chatRouter = new Hono();
 const llm = new GoogleGenAI({ apiKey: googleApiKey });
+const nanoSize = 21;
+
+const messageSchema = z.object({
+  content: z.string().min(1, 'Message content cannot be empty'),
+});
+
+const publicIdSchema = z.object({
+  publicid: z.string().length(nanoSize, 'Public ID must be exactly 21 characters long'),
+});
 
 const generateTitle = async (content: string) => {
   try {
@@ -45,7 +58,7 @@ chatRouter.post('/', authMiddleware, async (c) => {
     c.status(500);
     return c.text('Server Network Error, Please retry');
   }
-  const publicId = nanoid();
+  const publicId = nanoid(nanoSize);
   const newChat = await db
     .insert(chatTable)
     .values({
@@ -56,11 +69,11 @@ chatRouter.post('/', authMiddleware, async (c) => {
     .returning();
 
   // Insert the first message
-  await db.insert(messageTable).values({
-    chatId: newChat[0].id,
-    content,
-    role: Role.user,
-  });
+  // await db.insert(messageTable).values({
+  //   chatId: newChat[0].id,
+  //   content,
+  //   role: Role.user,
+  // });
 
   c.status(201);
   return c.json({
@@ -105,7 +118,7 @@ chatRouter.get('/', authMiddleware, async (c) => {
  * @param {string} publicid - The public ID of the chat
  * @return {object} - The chat info and messages
  */
-chatRouter.get('/:publicid', authMiddleware, async (c) => {
+chatRouter.get('/:publicid', zValidator('param', publicIdSchema), authMiddleware, async (c) => {
   const publicId = c.req.param('publicid');
   const chat = await db.query.chatTable.findFirst({
     where: and(eq(chatTable.publicId, publicId), eq(chatTable.ownerId, c.get('user').id)),
@@ -128,5 +141,65 @@ chatRouter.get('/:publicid', authMiddleware, async (c) => {
     messages: returnMessages,
   });
 });
+
+chatRouter.post(
+  '/:publicid/message',
+  zValidator('param', publicIdSchema),
+  authMiddleware,
+  zValidator('json', messageSchema),
+  async (c) => {
+    try {
+      const { content } = c.req.valid('json');
+      const chat = await db.query.chatTable.findFirst({
+        where: eq(chatTable.publicId, c.req.param('publicid')),
+      });
+      if (!chat) {
+        throw new NotFoundError('Chat not exist');
+      }
+
+      const response = await llm.models.generateContentStream({
+        model: 'gemini-2.5-flash-preview-05-20',
+        contents: content,
+        config: {
+          temperature: 1.2,
+        },
+      });
+
+      await db.insert(messageTable).values({
+        chatId: chat.id,
+        content,
+        role: Role.user,
+      });
+
+      c.status(201);
+      let finalAnswer = '';
+      return streamText(c, async (stream) => {
+        for await (const chunk of response) {
+          if (chunk.text) {
+            await stream.write(chunk.text);
+            finalAnswer += chunk.text;
+          }
+          if (chunk.candidates && chunk.candidates[0].finishReason === FinishReason.STOP) {
+            console.log('Generation finished');
+            await db.insert(messageTable).values({
+              chatId: chat.id,
+              content: finalAnswer,
+              role: Role.assistant,
+            });
+
+            await db
+              .update(chatTable)
+              .set({ lastUseAt: sql`(unixepoch())` })
+              .where(eq(chatTable.id, chat.id));
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error in /llm-stream route:', error);
+      c.status(500);
+      return c.json({ error: 'Failed to chat with Gemini API' });
+    }
+  }
+);
 
 export default chatRouter;

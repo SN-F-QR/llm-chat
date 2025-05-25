@@ -10,10 +10,10 @@ Content-Type: application/json
 
 POST http://localhost:3001/api/llm/chat-stream HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ4MDA5MDQ4LCJleHAiOjE3NTA2ODc0NDh9.gYgGNH5d4ZuJZxvFmY-gW-_AaP2iukbh-v9SOwI3Qjs
 
 {
-  "role": "user",
-  "content": "What is the bus waiting time paradox?"
+  "content": "Use one sentence to describe the advantages of using useMemo in React."
 }
 
 ###
@@ -74,6 +74,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxN
 
 ### Get messages in a specific chat
 
-GET http://localhost:3001/api/chat/VdVF2Jm3287Wh6mmblCYn HTTP/1.1
+GET http://localhost:3001/api/chat/VEgd9Bsjms_OsFf8BfTzj HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ4MDA5MDQ4LCJleHAiOjE3NTA2ODc0NDh9.gYgGNH5d4ZuJZxvFmY-gW-_AaP2iukbh-v9SOwI3Qjs
+
+### POST a new message to a specific chat
+
+POST http://localhost:3001/api/chat/VEgd9Bsjms_OsFf8BfTzj/message HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ4MDA5MDQ4LCJleHAiOjE3NTA2ODc0NDh9.gYgGNH5d4ZuJZxvFmY-gW-_AaP2iukbh-v9SOwI3Qjs
+
+{
+  "content": "Use one sentence to describe the advantages of using useCallback in React."
+}
