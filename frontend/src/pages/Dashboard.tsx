@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router';
 import NavBar from '../components/NavBar';
+import ChatListBar from '../components/ChatListBar';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const Dashboard = () => {
   return (
     <div className="relative w-full">
       <NavBar isAuth={isAuth} />
+      <ChatListBar />
       {isAuth ? <Outlet /> : <ProtectedRoute />}
     </div>
   );

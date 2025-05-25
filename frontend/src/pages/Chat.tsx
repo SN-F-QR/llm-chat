@@ -144,7 +144,7 @@ const Chat = () => {
   };
 
   return (
-    <div className="relative flex w-full flex-grow flex-col items-center justify-between space-y-2 p-4 pb-36">
+    <div className="relative flex w-full flex-grow flex-col items-center justify-between space-y-2 p-4 pb-36 md:pl-72">
       <ConversationBox
         messageList={messages}
         waiting={waiting}

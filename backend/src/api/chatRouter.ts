@@ -108,7 +108,7 @@ chatRouter.get('/', authMiddleware, async (c) => {
   c.status(200);
   return c.json({
     chats: chats,
-    tags: tags,
+    // tags: tags,
   });
 });
 

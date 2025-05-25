@@ -34,7 +34,7 @@ const NavBar: React.FC<{ isAuth: boolean }> = ({ isAuth }) => {
   };
 
   return (
-    <nav className="sticky top-0">
+    <nav className="sticky top-0 z-20">
       <div className="flex h-12 w-full items-center justify-between overflow-hidden border-b border-gray-200 bg-white p-4 shadow-sm">
         <span className="flex items-center space-x-2">
           <img className="size-8 rounded-full" src="/logo.jpeg" alt="Logo" />
