@@ -1,7 +1,7 @@
-export interface Message {
-  role: 'user' | 'assistant';
+export interface IMessage {
+  role: Role.user | Role.assistant | Role.system;
   content: string;
-  id: string;
+  createdAt: number;
 }
 
 export interface IUser {
@@ -10,4 +10,18 @@ export interface IUser {
   department: string;
   money: number;
   avatar: string | null;
+}
+
+export interface IChat {
+  title: string;
+  publicId: string;
+  ownerId: number;
+  createdAt: string;
+  lastUseAt: string;
+}
+
+export enum Role {
+  user = 0,
+  assistant = 1,
+  system = 2,
 }

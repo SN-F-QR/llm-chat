@@ -17,6 +17,7 @@ const App = () => {
             </Route>
             <Route path="/" element={<Dashboard />}>
               <Route index element={<Chat />} />
+              <Route path=":chatid" element={<Chat />} />
             </Route>
           </Routes>
         </div>

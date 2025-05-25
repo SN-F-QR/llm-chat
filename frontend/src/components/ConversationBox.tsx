@@ -1,4 +1,4 @@
-import { Message } from '../types/types';
+import { IMessage, Role } from '../types/types';
 import { Sparkle, RotateCcw, TriangleAlert, CircleStop } from 'lucide-react';
 import Markdown from 'markdown-to-jsx';
 import { useRef, useEffect } from 'react';
@@ -12,7 +12,7 @@ import { useRef, useEffect } from 'react';
  * @param reSendMessage function to resend the failed message
  */
 const ConversationBox: React.FC<{
-  messageList: Message[];
+  messageList: IMessage[];
   waiting: boolean;
   streaming: boolean;
   failedMessageId: string | undefined;
@@ -23,12 +23,12 @@ const ConversationBox: React.FC<{
     id: string
   ) => Promise<void>;
 }> = ({ messageList, waiting, failedMessageId, reSendMessage }) => {
-  const aborter = useRef<AbortController>(new AbortController());
+  // const aborter = useRef<AbortController>(new AbortController());
 
   const messageHistory = messageList.map((message) => (
-    <div className="flex items-end space-x-2" key={`${message.id}-${message.role}`}>
+    <div className="flex items-end space-x-2" key={`${message.createdAt}-${message.role}`}>
       <MessageBuble message={message} updating={waiting} />
-      {message.id === failedMessageId && message.role === 'user' && (
+      {/* {message.id === failedMessageId && message.role === Role.user && (
         <span className="flex items-center space-x-2">
           <TriangleAlert className="size-4 text-red-400" />
           {waiting ? (
@@ -50,7 +50,7 @@ const ConversationBox: React.FC<{
             />
           )}
         </span>
-      )}
+      )} */}
     </div>
   ));
 
@@ -62,7 +62,10 @@ const ConversationBox: React.FC<{
   );
 };
 
-const MessageBuble: React.FC<{ message: Message; updating: boolean }> = ({ message, updating }) => {
+const MessageBuble: React.FC<{ message: IMessage; updating: boolean }> = ({
+  message,
+  updating,
+}) => {
   const SyntaxHighlightedCode = (props: React.HTMLAttributes<HTMLElement>) => {
     const ref = useRef<HTMLElement | null>(null);
 
@@ -85,7 +88,7 @@ const MessageBuble: React.FC<{ message: Message; updating: boolean }> = ({ messa
 
   return (
     <div className="flex w-full">
-      {message.role === 'user' ? (
+      {message.role === Role.user ? (
         <div className="max-w-lg rounded-lg bg-purple-400 p-2 text-white">
           <p>{message.content}</p>
         </div>
