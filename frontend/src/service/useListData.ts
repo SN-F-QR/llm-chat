@@ -7,7 +7,10 @@ const useListData = <T>(url: string | undefined): T | undefined => {
   useEffect(() => {
     let ignore = false;
     const fetchData = async () => {
-      if (!reqClient.isLogin || !url) return;
+      if (!reqClient.isLogin || !url) {
+        setListData(undefined);
+        return;
+      }
       try {
         const response = await reqClient.client.get<T>(url);
         if (!ignore) {

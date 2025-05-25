@@ -15,9 +15,10 @@ const Dashboard = () => {
 
   return (
     <div className="relative w-full">
-      <NavBar isAuth={isAuth} />
       <ChatListBar />
+      <NavBar isAuth={isAuth} />
       {isAuth ? <Outlet /> : <ProtectedRoute />}
+      <div className="sticky"></div>
     </div>
   );
 };
