@@ -1,18 +1,40 @@
-import { useParams } from 'react-router';
-import { useState } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router';
+import { useEffect, useState } from 'react';
 import useListMessage from '../service/useListMessage';
-import { IMessage, Role } from '../types/types';
+import { IMessage, Role, IChat } from '../types/types';
 
 import InputBox from '../components/InputBox';
 import ConversationBox from '../components/ConversationBox';
+import reqClient from '../service/requestClient';
 
 const Chat = () => {
+  const navigate = useNavigate();
+  const newMessage = useLocation();
   const [sendFailed, setSendFailed] = useState<boolean>(false);
   const [waiting, setWaiting] = useState(false);
 
   const { chatid } = useParams<{ chatid: string }>();
   const url = chatid && `/chat/${chatid}`;
   const { listData, setData } = useListMessage<IMessage>(url, 'messages');
+
+  useEffect(() => {
+    console.log('Route changed');
+    const abortController = new AbortController();
+    // setData('reset');
+    if (newMessage.state) {
+      console.log('Route with a new message state');
+      const { newMessage: content } = newMessage.state as { newMessage: string };
+      if (content && chatid) {
+        void updateMessage(content, abortController);
+        window.history.replaceState({}, '');
+        console.log('Sending new message:', content);
+      }
+    }
+    return () => {
+      abortController.abort();
+      console.log('Cleaning up the sending process');
+    };
+  }, [chatid]);
 
   const streamMessage = async (message: string, abortController: AbortController) => {
     try {
@@ -54,11 +76,7 @@ const Chat = () => {
         console.log('User aborted streaming');
         return;
       }
-      setData('pop', {
-        role: Role.assistant,
-        content: '',
-        createdAt: Date.now() / 1000,
-      });
+      setData('pop');
       setSendFailed(true);
       console.error('Error streaming chat message:', error);
     } finally {
@@ -70,10 +88,9 @@ const Chat = () => {
    * Handles the POST and UI update when submitting the new input
    * @param content of users input
    * @param stream if the llm message should be streamed
-   * @param id of the message to update
    */
   const updateMessage = async (content: string, abort: AbortController) => {
-    if (!content || waiting) return;
+    if (!content) return;
     // Optimistically update
     const messageInput: IMessage = {
       role: Role.user,
@@ -86,7 +103,19 @@ const Chat = () => {
       content: '',
       createdAt: Date.now() / 1000,
     });
-    // TODO: Judge if new message is sent
+    setWaiting(true);
+
+    if (!chatid) {
+      const response = await reqClient.client.post<IChat>('/chat', {
+        content: content,
+      });
+      const { publicId } = response.data;
+      void navigate(`/${publicId}`, {
+        state: { newMessage: content, abortController: abort },
+        replace: true,
+      });
+      return;
+    }
     await streamMessage(messageInput.content, abort);
   };
 
@@ -104,7 +133,7 @@ const Chat = () => {
         reSendMessage={updateMessage}
       />
       <div className="fixed bottom-4 w-full max-w-xl">
-        <InputBox submitFunc={sendNewMessage} />
+        <InputBox submitFunc={sendNewMessage} waiting={waiting} />
       </div>
     </div>
   );

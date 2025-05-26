@@ -35,7 +35,7 @@ const ChatListBar = () => {
       }
     };
     void fetchChats();
-  }, []);
+  }, [chatid]);
 
   const navigate = useNavigate();
   const handleClick = (publicId: string) => {
@@ -54,20 +54,20 @@ const ChatListBar = () => {
 
   return (
     <div className="fixed top-0 left-0 z-10 h-svh max-w-lg bg-purple-100/50 pt-12">
-      <div className="hidden h-full w-72 flex-col justify-between p-2 md:flex">
+      <div className="hidden h-full w-72 flex-col justify-between overflow-auto p-2 md:flex">
         <div className="flex-col items-start space-y-1 first:mt-2 md:flex">
           <ChatListButton
             title="Start a new chat"
             publicId=""
-            isActive={chatid === ''}
+            isActive={chatid === undefined}
             navigate={handleClick}
           >
             <MessageCirclePlus className="mr-1 size-5 text-gray-700" />
           </ChatListButton>
-          <h2 className="mt-4 mb-1 px-2 text-sm text-gray-500">Recent chats</h2>
+          <h2 className="mt-2 mb-1 px-2 text-sm text-gray-500">Recent chats</h2>
           {chatListComponents}
         </div>
-        <PanelLeftClose className="mx-2 my-2 size-5 text-gray-500" />
+        <PanelLeftClose className="mx-2 my-2 size-5 shrink-0 text-gray-500" />
       </div>
     </div>
   );
@@ -81,15 +81,15 @@ const ChatListButton: React.FC<{
   children?: React.ReactNode;
 }> = ({ title, publicId, isActive, navigate, children }) => {
   return (
-    <span className="w-full">
+    <span className="w-full px-2">
       <button
-        className={`flex w-full cursor-pointer items-center rounded-2xl px-4 py-2 hover:bg-purple-200 ${isActive ? 'bg-purple-200' : ''}`}
+        className={`flex w-full cursor-pointer items-center rounded-2xl px-4 py-2 hover:bg-purple-200 ${isActive ? 'bg-purple-200' : ''} justify-start`}
         onClick={() => {
           navigate(publicId);
         }}
       >
         {children}
-        <p className="line-clamp-1 h-6">{title}</p>
+        <p className="line-clamp-1 text-nowrap">{title}</p>
       </button>
     </span>
   );

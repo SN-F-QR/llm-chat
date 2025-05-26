@@ -8,36 +8,44 @@ import { useState, useEffect } from 'react';
  * @returns listData and a function to set data in the list
  */
 const useListMessage = <T>(url?: string, keyOfList?: string) => {
-  const [listData, setListData] = useState<T[] | undefined>(undefined);
+  const [listData, setListData] = useState<T[]>([]);
 
-  const setData = (type: 'push' | 'pop' | 'set', data: T) => {
-    setListData((prevData) => {
-      if (!prevData) return undefined;
-      if (type === 'push') {
-        return [...prevData, data];
+  const setData = (type: 'push' | 'pop' | 'set' | 'reset', data?: T) => {
+    if (!data) {
+      if (type === 'reset') {
+        setListData([]);
       } else if (type === 'pop') {
-        return prevData.slice(0, -1);
-      } else if (type === 'set') {
-        return [...prevData.slice(0, -1), data];
+        setListData((prevData) => prevData.slice(0, -1));
       }
-      return prevData;
-    });
+    } else {
+      setListData((prevData) => {
+        if (type === 'push') {
+          return [...prevData, data];
+        } else if (type === 'set') {
+          return [...prevData.slice(0, -1), data];
+        }
+        return prevData;
+      });
+    }
   };
 
   useEffect(() => {
     let ignore = false;
+    const abortController = new AbortController();
     const fetchData = async () => {
       if (!reqClient.isLogin || !url) {
-        setListData(undefined);
+        setListData([]);
         return;
       }
       try {
-        const response = await reqClient.client.get<object>(url);
+        const response = await reqClient.client.get<object>(url, {
+          signal: abortController.signal,
+        });
         if (!ignore) {
           if (response.data !== null) {
             const data = response.data;
             if (keyOfList && keyOfList in data) {
-              setListData(data[keyOfList as keyof typeof data] as T[]);
+              setListData(() => [...(data[keyOfList as keyof typeof data] as T[])]);
             } else {
               throw new Error(`Key "${keyOfList}" not found in response data`);
             }
@@ -53,6 +61,7 @@ const useListMessage = <T>(url?: string, keyOfList?: string) => {
 
     return () => {
       ignore = true;
+      abortController.abort();
     };
   }, [url, keyOfList]);
 

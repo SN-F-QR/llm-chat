@@ -3,7 +3,8 @@ import { useRef, useState } from 'react';
 
 const InputBox: React.FC<{
   submitFunc: (arg: string, abort: AbortController) => Promise<void>;
-}> = ({ submitFunc }) => {
+  waiting: boolean;
+}> = ({ submitFunc, waiting }) => {
   const [text, setText] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -59,7 +60,11 @@ const InputBox: React.FC<{
               </div>
             </button>
           ) : (
-            <button onClick={() => void handleSubmit()}>
+            <button
+              onClick={() => void handleSubmit()}
+              disabled={waiting}
+              className="disabled:cursor-wait"
+            >
               <SendHorizontal className="size-8 cursor-pointer rounded-lg bg-purple-500 p-1 text-white" />
             </button>
           )}
