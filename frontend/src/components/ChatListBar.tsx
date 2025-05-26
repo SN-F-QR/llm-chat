@@ -81,17 +81,15 @@ const ChatListButton: React.FC<{
   children?: React.ReactNode;
 }> = ({ title, publicId, isActive, navigate, children }) => {
   return (
-    <span
-      className={`w-full rounded-2xl px-4 py-2 hover:bg-purple-200 ${isActive ? 'bg-purple-200' : ''}`}
-    >
+    <span className="w-full">
       <button
-        className="flex h-6 w-full cursor-pointer items-center"
+        className={`flex w-full cursor-pointer items-center rounded-2xl px-4 py-2 hover:bg-purple-200 ${isActive ? 'bg-purple-200' : ''}`}
         onClick={() => {
           navigate(publicId);
         }}
       >
         {children}
-        <p className="line-clamp-1">{title}</p>
+        <p className="line-clamp-1 h-6">{title}</p>
       </button>
     </span>
   );
