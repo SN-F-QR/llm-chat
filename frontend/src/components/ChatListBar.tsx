@@ -1,5 +1,5 @@
 import { MessageCirclePlus, PanelLeftClose } from 'lucide-react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useState, useEffect } from 'react';
 import reqClient from '../service/requestClient';
 import { AxiosError } from 'axios';
@@ -12,7 +12,7 @@ interface Chat {
 }
 
 const ChatListBar = () => {
-  const [activeChat, setActiveChat] = useState<string>('');
+  const { chatid } = useParams<{ chatid: string }>();
   const [chats, setChats] = useState<Chat[]>([]);
 
   useEffect(() => {
@@ -39,8 +39,6 @@ const ChatListBar = () => {
 
   const navigate = useNavigate();
   const handleClick = (publicId: string) => {
-    if (activeChat === publicId) return;
-    setActiveChat(publicId);
     void navigate(`/${publicId}`);
   };
 
@@ -49,7 +47,7 @@ const ChatListBar = () => {
       key={chat.publicId}
       title={chat.title}
       publicId={chat.publicId}
-      isActive={activeChat === chat.publicId}
+      isActive={chatid === chat.publicId}
       navigate={handleClick}
     />
   ));
@@ -61,7 +59,7 @@ const ChatListBar = () => {
           <ChatListButton
             title="Start a new chat"
             publicId=""
-            isActive={activeChat === ''}
+            isActive={chatid === ''}
             navigate={handleClick}
           >
             <MessageCirclePlus className="mr-1 size-5 text-gray-700" />
