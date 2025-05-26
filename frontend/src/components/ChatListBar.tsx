@@ -56,7 +56,7 @@ const ChatListBar = () => {
 
   return (
     <div className="fixed top-0 left-0 z-10 h-svh max-w-lg bg-purple-100/50 pt-12">
-      <div className="p2- hidden h-full w-72 flex-col justify-between p-2 md:flex">
+      <div className="hidden h-full w-72 flex-col justify-between p-2 md:flex">
         <div className="flex-col items-start space-y-1 first:mt-2 md:flex">
           <ChatListButton
             title="Start a new chat"

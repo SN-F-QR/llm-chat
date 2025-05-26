@@ -15,20 +15,15 @@ const ConversationBox: React.FC<{
   messageList: IMessage[];
   waiting: boolean;
   streaming: boolean;
-  failedMessageId: string | undefined;
-  reSendMessage: (
-    message: string,
-    abort: AbortController,
-    stream: boolean,
-    id: string
-  ) => Promise<void>;
-}> = ({ messageList, waiting, failedMessageId, reSendMessage }) => {
-  // const aborter = useRef<AbortController>(new AbortController());
+  failed: boolean;
+  reSendMessage: (content: string, abort: AbortController) => Promise<void>;
+}> = ({ messageList, waiting, failed, reSendMessage }) => {
+  const aborter = useRef<AbortController>(new AbortController());
 
-  const messageHistory = messageList.map((message) => (
+  const messageHistory = messageList.map((message, index) => (
     <div className="flex items-end space-x-2" key={`${message.createdAt}-${message.role}`}>
       <MessageBuble message={message} updating={waiting} />
-      {/* {message.id === failedMessageId && message.role === Role.user && (
+      {failed && index === messageList.length - 1 && message.role === Role.user && (
         <span className="flex items-center space-x-2">
           <TriangleAlert className="size-4 text-red-400" />
           {waiting ? (
@@ -41,7 +36,7 @@ const ConversationBox: React.FC<{
             <RetryButton
               onClick={() => {
                 const handler = async () => {
-                  await reSendMessage(message.content, aborter.current, true, message.id);
+                  await reSendMessage(message.content, aborter.current);
                   aborter.current = new AbortController();
                   return;
                 };
@@ -50,7 +45,7 @@ const ConversationBox: React.FC<{
             />
           )}
         </span>
-      )} */}
+      )}
     </div>
   ));
 

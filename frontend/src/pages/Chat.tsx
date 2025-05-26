@@ -1,24 +1,23 @@
 import { useParams } from 'react-router';
 import { useState } from 'react';
-import useListData from '../service/useListData';
-import { IMessage, IChat, Role } from '../types/types';
+import useListMessage from '../service/useListMessage';
+import { IMessage, Role } from '../types/types';
 
 import InputBox from '../components/InputBox';
 import ConversationBox from '../components/ConversationBox';
 
 const Chat = () => {
-  const [messages, setMessages] = useState<IMessage[]>([]);
-  const [failedMessageId, setFailedMessageId] = useState<string | undefined>(undefined);
+  const [sendFailed, setSendFailed] = useState<boolean>(false);
   const [waiting, setWaiting] = useState(false);
 
   const { chatid } = useParams<{ chatid: string }>();
   const url = chatid && `/chat/${chatid}`;
-  const chatData = useListData<IChat & { messages: IMessage[] }>(url);
+  const { listData, setData } = useListMessage<IMessage>(url, 'messages');
 
   const streamMessage = async (message: string, abortController: AbortController) => {
     try {
       setWaiting(true);
-      const response = await fetch('/api/llm/chat-stream', {
+      const response = await fetch(`/api${url}/message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,38 +33,33 @@ const Chat = () => {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
+      let fullText = '';
       while (true) {
         const { done, value } = await reader.read();
         if (done) {
-          setFailedMessageId(undefined);
+          setSendFailed(false);
           break;
         }
         const text = decoder.decode(value);
-        setMessages((prevMessages) => {
-          const lastMessage = prevMessages[prevMessages.length - 1];
-          if (lastMessage && lastMessage.role === Role.assistant) {
-            return [
-              ...prevMessages.slice(0, -1),
-              { ...lastMessage, content: lastMessage.content + text },
-            ];
-          }
-          throw new Error('Message not found');
-        });
+        fullText += text;
+        setData('set', { role: Role.assistant, content: fullText, createdAt: Date.now() / 1000 });
       }
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') {
-        setMessages((prevMessages) => {
-          const lastMessage = prevMessages[prevMessages.length - 1];
-          if (lastMessage.content === '') {
-            lastMessage.content = 'Aborted';
-          }
-          return [...prevMessages.slice(0, -1), lastMessage];
+        setData('set', {
+          role: Role.assistant,
+          content: 'Aborted',
+          createdAt: Date.now() / 1000,
         });
         console.log('User aborted streaming');
         return;
       }
-      setMessages((prevMessages) => [...prevMessages.slice(0, -1)]);
-      // setFailedMessageId(id);
+      setData('pop', {
+        role: Role.assistant,
+        content: '',
+        createdAt: Date.now() / 1000,
+      });
+      setSendFailed(true);
       console.error('Error streaming chat message:', error);
     } finally {
       setWaiting(false);
@@ -80,16 +74,19 @@ const Chat = () => {
    */
   const updateMessage = async (content: string, abort: AbortController) => {
     if (!content || waiting) return;
+    // Optimistically update
     const messageInput: IMessage = {
       role: Role.user,
       content: content,
-      createdAt: Date.now() / 1000, // Optimistic timestamp
+      createdAt: Date.now() / 1000,
     };
-    setMessages((prevMessages) => [...prevMessages, messageInput]);
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { role: Role.assistant, content: '', createdAt: Date.now() / 1000 },
-    ]);
+    setData('push', messageInput);
+    setData('push', {
+      role: Role.assistant,
+      content: '',
+      createdAt: Date.now() / 1000,
+    });
+    // TODO: Judge if new message is sent
     await streamMessage(messageInput.content, abort);
   };
 
@@ -100,10 +97,10 @@ const Chat = () => {
   return (
     <div className="relative flex w-full flex-grow flex-col items-center justify-between space-y-2 p-4 pb-36 md:pl-72">
       <ConversationBox
-        messageList={chatData?.messages ?? []}
+        messageList={listData ?? []}
         waiting={waiting}
         streaming={true}
-        failedMessageId={failedMessageId}
+        failed={sendFailed}
         reSendMessage={updateMessage}
       />
       <div className="fixed bottom-4 w-full max-w-xl">
