@@ -2,7 +2,7 @@ import { SendHorizontal, CircleStop } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 const InputBox: React.FC<{
-  submitFunc: (arg: string, abort: AbortController) => Promise<void>;
+  submitFunc: (arg: string) => void;
   waiting: boolean;
 }> = ({ submitFunc, waiting }) => {
   const [text, setText] = useState<string>('');
@@ -18,7 +18,7 @@ const InputBox: React.FC<{
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     console.log('Submitting message:', text);
     try {
       setIsSubmitting(true);
@@ -26,7 +26,7 @@ const InputBox: React.FC<{
         textAreaRef.current.value = '';
         textAreaRef.current.style.height = 'auto';
       }
-      await submitFunc(text, aborter.current);
+      submitFunc(text);
     } catch {
       console.error('Error submitting message:', text);
     } finally {
@@ -55,17 +55,17 @@ const InputBox: React.FC<{
                 aborter.current.abort();
               }}
             >
-              <div className="overflow-hidden rounded-lg bg-purple-500">
-                <CircleStop className="size-8 p-1 text-white" />
+              <div className="overflow-hidden rounded-full bg-purple-200 p-2">
+                <CircleStop className="size-4 text-white" />
               </div>
             </button>
           ) : (
             <button
               onClick={() => void handleSubmit()}
-              disabled={waiting}
-              className="disabled:cursor-wait"
+              disabled={waiting || text.trim() === ''}
+              className="rounded-full bg-purple-200 p-2 transition-all duration-300 disabled:pointer-events-none disabled:translate-y-1 disabled:opacity-0"
             >
-              <SendHorizontal className="size-8 cursor-pointer rounded-lg bg-purple-500 p-1 text-white" />
+              <SendHorizontal className="size-5 cursor-pointer text-gray-500" />
             </button>
           )}
         </span>

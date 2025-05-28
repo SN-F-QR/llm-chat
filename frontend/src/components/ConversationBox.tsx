@@ -14,9 +14,8 @@ import { useRef, useEffect } from 'react';
 const ConversationBox: React.FC<{
   messageList: IMessage[];
   waiting: boolean;
-  streaming: boolean;
   failed: boolean;
-  reSendMessage: (content: string, abort: AbortController) => Promise<void>;
+  reSendMessage: (content: string) => void;
 }> = ({ messageList, waiting, failed, reSendMessage }) => {
   const aborter = useRef<AbortController>(new AbortController());
 
@@ -35,8 +34,8 @@ const ConversationBox: React.FC<{
           ) : (
             <RetryButton
               onClick={() => {
-                const handler = async () => {
-                  await reSendMessage(message.content, aborter.current);
+                const handler = () => {
+                  reSendMessage(message.content);
                   aborter.current = new AbortController();
                   return;
                 };

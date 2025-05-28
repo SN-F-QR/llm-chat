@@ -2,6 +2,7 @@ import Dashboard from './Dashboard';
 import Auth from './Auth';
 import Login from './Login';
 import SignUp from './Signup';
+import NewChat from './NewChat';
 import Chat from './Chat';
 import { BrowserRouter, Routes, Route } from 'react-router';
 
@@ -16,7 +17,7 @@ const App = () => {
               <Route path="signup" element={<SignUp />} />
             </Route>
             <Route path="/" element={<Dashboard />}>
-              <Route index element={<Chat />} />
+              <Route index element={<NewChat />} />
               <Route path=":chatid" element={<Chat />} />
             </Route>
           </Routes>

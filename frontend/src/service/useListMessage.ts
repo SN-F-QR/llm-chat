@@ -1,71 +1,102 @@
 import reqClient from './requestClient';
-import { useState, useEffect } from 'react';
+import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
+import { IChat, IMessage, Role } from '../types/types';
+import useStore from './chatState';
 
 /**
- * Fetch and manage a list of data
- * @param url url to fetch the list data
- * @param keyOfList the key in the response data that contains the list
- * @returns listData and a function to set data in the list
+ * Fetch and manage messages
  */
-const useListMessage = <T>(url?: string, keyOfList?: string) => {
-  const [listData, setListData] = useState<T[]>([]);
+const useListMessage = (chatId: string) => {
+  const queryClient = useQueryClient();
 
-  const setData = (type: 'push' | 'pop' | 'set' | 'reset', data?: T) => {
-    if (!data) {
-      if (type === 'reset') {
-        setListData([]);
-      } else if (type === 'pop') {
-        setListData((prevData) => prevData.slice(0, -1));
+  const updateMessage = (message: string, chatId: string) => {
+    queryClient.setQueryData<IMessage[]>([chatId, 'messages'], (previous) => {
+      if (!previous) {
+        return undefined;
       }
-    } else {
-      setListData((prevData) => {
-        if (type === 'push') {
-          return [...prevData, data];
-        } else if (type === 'set') {
-          return [...prevData.slice(0, -1), data];
-        }
-        return prevData;
-      });
-    }
+      const unchanged = previous.slice(0, -1);
+      const updatedMessage: IMessage = { ...previous[previous.length - 1], content: message };
+      return [...unchanged, updatedMessage];
+    });
   };
 
-  useEffect(() => {
-    let ignore = false;
-    const abortController = new AbortController();
-    const fetchData = async () => {
-      if (!reqClient.isLogin || !url) {
-        setListData([]);
-        return;
+  const messagesQuery = useQuery<IMessage[]>({
+    queryKey: [chatId, 'messages'],
+    queryFn: async () => {
+      if (chatId === '') {
+        return [];
       }
-      try {
-        const response = await reqClient.client.get<object>(url, {
-          signal: abortController.signal,
-        });
-        if (!ignore) {
-          if (response.data !== null) {
-            const data = response.data;
-            if (keyOfList && keyOfList in data) {
-              setListData(() => [...(data[keyOfList as keyof typeof data] as T[])]);
-            } else {
-              throw new Error(`Key "${keyOfList}" not found in response data`);
-            }
-          } else {
-            throw new TypeError('response is not an object');
-          }
+
+      const response = await reqClient.client.get<IChat & { messages: IMessage[] }>(
+        `/chat/${chatId}`
+      );
+      return response.data.messages;
+    },
+  });
+
+  const abortController = useStore((state) => state.abortController);
+
+  const messagesMutate = useMutation({
+    mutationFn: async (args: { message: string; chatId: string }) => {
+      const { message, chatId } = args;
+      const response = await fetch(`/api/chat/${chatId}/message`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ content: message }),
+        signal: abortController.signal,
+      });
+
+      if (!response.body || !response.ok) {
+        const error = await response.text();
+        throw new Error(response.statusText + error);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
         }
-      } catch (error) {
-        console.error('Error fetching list data:', error);
+        const text = decoder.decode(value);
+        fullText += text;
+        updateMessage(fullText, chatId);
       }
-    };
-    void fetchData();
+    },
+    // fired before the mutation fc
+    onMutate: async ({ message, chatId }) => {
+      if (chatId === '' || message.trim() === '') {
+        throw new Error('Chat ID or message cannot be empty');
+      }
+      // return messages for possible rollback
+      await queryClient.cancelQueries({ queryKey: [chatId, 'messages'] });
+      const oldMessages = queryClient.getQueryData<IMessage[]>([chatId, 'messages']);
+      queryClient.setQueryData<IMessage[]>([chatId, 'messages'], (previous) => {
+        const pendingMessages = [
+          { role: Role.user, content: message, createdAt: Date.now() / 1000 },
+          { role: Role.assistant, content: '', createdAt: Date.now() / 1000 },
+        ];
+        if (!previous) {
+          return [...pendingMessages];
+        }
+        return [...previous, ...pendingMessages];
+      });
+      return { oldMessages };
+    },
+    onError: (error) => {
+      // TODO: filter with ID, mark the failed user message
+      console.error('Error sending message:', error);
+    },
+  });
 
-    return () => {
-      ignore = true;
-      abortController.abort();
-    };
-  }, [url, keyOfList]);
-
-  return { listData, setData };
+  return {
+    messagesQuery,
+    messagesMutate,
+  };
 };
 
 export default useListMessage;
