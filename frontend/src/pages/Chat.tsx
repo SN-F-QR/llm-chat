@@ -16,7 +16,7 @@ const Chat = () => {
     messagesMutate.isPending || messagesQuery.data?.[messagesQuery.data.length - 1]?.content === '';
 
   return (
-    <div className="relative flex w-full flex-grow flex-col items-center justify-between space-y-2 p-4 pb-36 md:pl-72">
+    <div className="scrollbar relative mt-12 flex max-h-[95dvh] w-full flex-grow flex-col items-center justify-between space-y-2 overflow-auto md:pl-72">
       <ConversationBox
         messageList={messagesQuery.data ?? []}
         waiting={isWaiting}

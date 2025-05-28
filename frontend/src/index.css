@@ -1,1 +1,10 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+@layer components {
+  .scrollbar {
+    @apply [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:hidden [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 hover:[&::-webkit-scrollbar-thumb]:block [&::-webkit-scrollbar-track]:hidden;
+  }
+  .enable-animation {
+    @apply transition-all duration-300;
+  }
+}

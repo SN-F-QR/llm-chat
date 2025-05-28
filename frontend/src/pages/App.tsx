@@ -9,7 +9,7 @@ import { BrowserRouter, Routes, Route } from 'react-router';
 const App = () => {
   return (
     <BrowserRouter>
-      <div className="flex min-h-dvh w-full flex-col overflow-auto">
+      <div className="flex min-h-dvh w-full flex-col">
         <div className="flex w-full flex-grow flex-col">
           <Routes>
             <Route path="/auth" element={<Auth />}>

@@ -7,7 +7,6 @@ import { TriangleAlert } from 'lucide-react';
 
 const ChatListBar = () => {
   const { chatid } = useParams<{ chatid: string }>();
-  // const [chats, setChats] = useState<Chat[]>([]);
 
   const chatsQuery = useQuery<IChat[]>({
     queryKey: ['chats'],
@@ -36,9 +35,9 @@ const ChatListBar = () => {
   ));
 
   return (
-    <div className="fixed top-0 left-0 z-10 h-svh max-w-lg bg-purple-100/50 pt-12">
-      <div className="hidden h-full w-72 flex-col justify-between overflow-auto p-2 md:flex">
-        <div className="flex-col items-start space-y-1 first:mt-2 md:flex">
+    <div className="fixed top-0 left-0 z-10 h-svh max-w-lg bg-purple-100/50 pt-10">
+      <div className="hidden h-full w-72 flex-col justify-between p-2 pr-0 md:relative md:flex">
+        <div className="scrollbar mb-8 flex-col items-start space-y-1 overflow-auto first:mt-2 md:flex">
           <ChatListButton
             title="Start a new chat"
             publicId=""
@@ -51,7 +50,7 @@ const ChatListBar = () => {
           {chatListComponents}
           {chatsQuery.isError && <ErrorMessage message={chatsQuery.error.message} />}
         </div>
-        <PanelLeftClose className="mx-2 my-2 size-5 shrink-0 text-gray-500" />
+        <PanelLeftClose className="absolute bottom-0 left-0 mx-4 my-4 size-5 text-gray-500" />
       </div>
     </div>
   );
@@ -73,7 +72,7 @@ const ChatListButton: React.FC<{
         }}
       >
         {children}
-        <p className="line-clamp-1 text-nowrap">{title}</p>
+        <p className="line-clamp-1 text-left">{title}</p>
       </button>
     </span>
   );

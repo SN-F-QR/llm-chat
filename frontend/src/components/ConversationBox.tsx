@@ -41,7 +41,7 @@ const ConversationBox: React.FC<{
   ));
 
   return (
-    <div className="mt-12 flex w-full max-w-3xl flex-col space-y-4 rounded-2xl p-4">
+    <div className="flex w-full max-w-3xl flex-col space-y-4 rounded-2xl p-4 pb-36">
       {messageHistory}
       {/* {waiting && <LoadingMessage />} */}
     </div>

@@ -24,7 +24,7 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="relative w-full">
+    <div className="relative h-full max-h-screen w-full overflow-hidden">
       <NavBar isAuth={isAuth} />
       <QueryClientProvider client={queryClient}>
         <ChatListBar />
