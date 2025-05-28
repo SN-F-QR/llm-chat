@@ -58,15 +58,17 @@ const NewChat = () => {
 
   return (
     // TODO: Implement the failed message
-    <div className="relative flex w-full flex-grow flex-col items-center justify-between space-y-2 p-4 pb-36 md:pl-72">
+    <div className="scrollbar relative mt-12 flex max-h-[95dvh] w-full flex-grow flex-col items-center justify-between space-y-2 overflow-auto">
       <ConversationBox
         messageList={tempMessages}
         waiting={waiting}
         failed={false}
         reSendMessage={sendFirstMessage}
       />
-      <div className="fixed bottom-4 w-full max-w-xl">
-        <InputBox submitFunc={sendFirstMessage} waiting={waiting} />
+      <div className="sticky bottom-8 flex w-full flex-col items-center px-4">
+        <div className="w-full max-w-3xl">
+          <InputBox submitFunc={sendFirstMessage} waiting={waiting} />
+        </div>
       </div>
     </div>
   );
