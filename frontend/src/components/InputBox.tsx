@@ -37,7 +37,7 @@ const InputBox: React.FC<{
   };
 
   return (
-    <div className="w-full rounded-2xl border border-gray-200 bg-white p-4 shadow-lg shadow-purple-100">
+    <div className="w-full rounded-2xl border border-gray-200 bg-white/80 p-4 shadow-lg shadow-purple-100 backdrop-blur-3xl">
       <div className="flex max-h-72 min-h-20 w-full flex-col justify-between overflow-hidden">
         <textarea
           ref={textAreaRef}
@@ -56,7 +56,7 @@ const InputBox: React.FC<{
               }}
             >
               <div className="overflow-hidden rounded-full bg-purple-200 p-2">
-                <CircleStop className="size-4 text-white" />
+                <CircleStop className="size-5 text-gray-400" />
               </div>
             </button>
           ) : (

@@ -4,9 +4,28 @@ import { useQuery } from '@tanstack/react-query';
 import { IChat } from '../types/types';
 import reqClient from '../service/requestClient';
 import { TriangleAlert } from 'lucide-react';
+import { useDashboardStore } from '../service/chatState';
+import { useEffect } from 'react';
 
 const ChatListBar = () => {
   const { chatid } = useParams<{ chatid: string }>();
+
+  const expandState = useDashboardStore((state) => state.expandChatList);
+  const setExpandState = useDashboardStore((state) => state.setExpand);
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setExpandState(false);
+        return;
+      }
+      setExpandState(true);
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const chatsQuery = useQuery<IChat[]>({
     queryKey: ['chats'],
@@ -35,9 +54,11 @@ const ChatListBar = () => {
   ));
 
   return (
-    <div className="fixed top-0 left-0 z-10 h-svh max-w-lg bg-purple-100/50 pt-10">
-      <div className="hidden h-full w-72 flex-col justify-between p-2 pr-0 md:relative md:flex">
-        <div className="scrollbar mb-8 flex-col items-start space-y-1 overflow-auto first:mt-2 md:flex">
+    <div
+      className={`enable-animation z-10 h-svh bg-purple-100/50 pt-10 duration-200 ${expandState ? 'translate-x-0' : 'w-0 -translate-x-96'}`}
+    >
+      <div className="flex h-full w-72 flex-col p-2 pr-0 md:relative">
+        <div className="scrollbar mb-8 flex flex-col items-start space-y-1 overflow-auto first:mt-2">
           <ChatListButton
             title="Start a new chat"
             publicId=""
@@ -50,7 +71,12 @@ const ChatListBar = () => {
           {chatListComponents}
           {chatsQuery.isError && <ErrorMessage message={chatsQuery.error.message} />}
         </div>
-        <PanelLeftClose className="absolute bottom-0 left-0 mx-4 my-4 size-5 text-gray-500" />
+        <button
+          className="absolute bottom-0 left-0 mx-4 my-4 size-5 cursor-pointer text-gray-500"
+          onClick={() => setExpandState(!expandState)}
+        >
+          <PanelLeftClose className="size-5 text-gray-500" />
+        </button>
       </div>
     </div>
   );

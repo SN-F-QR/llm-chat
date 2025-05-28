@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { LogOut } from 'lucide-react';
+import { LogOut, Menu } from 'lucide-react';
 import reqClient from '../service/requestClient';
 import { IUser } from '../types/types';
+import { useDashboardStore } from '../service/chatState';
 
 const NavBar: React.FC<{ isAuth: boolean }> = ({ isAuth }) => {
   const [user, setUser] = useState<IUser | undefined>(undefined);
   const [hover, setHover] = useState(false);
+  const expandState = useDashboardStore((state) => state.expandChatList);
+  const setExpandState = useDashboardStore((state) => state.setExpand);
   useEffect(() => {
     const loginUser = async () => {
       try {
@@ -36,7 +39,13 @@ const NavBar: React.FC<{ isAuth: boolean }> = ({ isAuth }) => {
   return (
     <nav className="fixed top-0 z-20 w-full">
       <div className="flex h-12 w-full items-center justify-between overflow-hidden border-b border-gray-200 bg-white p-4 shadow-sm">
-        <span className="flex items-center space-x-2">
+        <span className={`flex items-center space-x-2`}>
+          <button
+            className={`enable-animation cursor-pointer ${expandState ? '-translate-x-10' : ''}`}
+            onClick={() => setExpandState(!expandState)}
+          >
+            {!expandState && <Menu className="size-5" />}
+          </button>
           <img className="size-8 rounded-full" src="/logo.jpeg" alt="Logo" />
           <h1 className="cursor-default text-lg font-semibold">LLM Chat</h1>
         </span>

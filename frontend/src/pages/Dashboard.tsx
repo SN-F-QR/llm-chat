@@ -27,8 +27,10 @@ const Dashboard = () => {
     <div className="relative h-full max-h-screen w-full overflow-hidden">
       <NavBar isAuth={isAuth} />
       <QueryClientProvider client={queryClient}>
-        <ChatListBar />
-        {isAuth ? <Outlet /> : <ProtectedRoute />}
+        <div className="flex w-full">
+          <ChatListBar />
+          {isAuth ? <Outlet /> : <ProtectedRoute />}
+        </div>
       </QueryClientProvider>
       <div className="sticky"></div>
     </div>
