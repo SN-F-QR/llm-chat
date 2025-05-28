@@ -15,7 +15,6 @@ export interface IUser {
 export interface IChat {
   title: string;
   publicId: string;
-  ownerId: number;
   createdAt: string;
   lastUseAt: string;
 }

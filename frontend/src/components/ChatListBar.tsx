@@ -1,48 +1,31 @@
 import { MessageCirclePlus, PanelLeftClose } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { IChat } from '../types/types';
 import reqClient from '../service/requestClient';
-import { AxiosError } from 'axios';
-
-interface Chat {
-  title: string;
-  publicId: string;
-  createdAt: string;
-  lastUsedAt: string;
-}
+import { TriangleAlert } from 'lucide-react';
 
 const ChatListBar = () => {
   const { chatid } = useParams<{ chatid: string }>();
-  const [chats, setChats] = useState<Chat[]>([]);
+  // const [chats, setChats] = useState<Chat[]>([]);
 
-  useEffect(() => {
-    if (!reqClient.isLogin) {
-      return;
-    }
-    const fetchChats = async () => {
-      try {
-        const response = await reqClient.client.get<{ chats: Chat[] }>('/chat');
-        const chats = response.data.chats;
-        if (chats.length > 0) {
-          setChats(chats);
-        }
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error('Error fetching chat list:', error.message);
-        } else {
-          console.error('Unexpected error fetching chat list:', error);
-        }
+  const chatsQuery = useQuery<IChat[]>({
+    queryKey: ['chats'],
+    queryFn: async () => {
+      if (!reqClient.isLogin) {
+        throw new Error('User is not logged in');
       }
-    };
-    void fetchChats();
-  }, [chatid]);
+      const response = await reqClient.client.get<{ chats: IChat[] }>('/chat');
+      return response.data.chats;
+    },
+  });
 
   const navigate = useNavigate();
   const handleClick = (publicId: string) => {
     void navigate(`/${publicId}`);
   };
 
-  const chatListComponents = chats.map((chat) => (
+  const chatListComponents = chatsQuery.data?.map((chat) => (
     <ChatListButton
       key={chat.publicId}
       title={chat.title}
@@ -66,6 +49,7 @@ const ChatListBar = () => {
           </ChatListButton>
           <h2 className="mt-2 mb-1 px-2 text-sm text-gray-500">Recent chats</h2>
           {chatListComponents}
+          {chatsQuery.isError && <ErrorMessage message={chatsQuery.error.message} />}
         </div>
         <PanelLeftClose className="mx-2 my-2 size-5 shrink-0 text-gray-500" />
       </div>
@@ -91,6 +75,15 @@ const ChatListButton: React.FC<{
         {children}
         <p className="line-clamp-1 text-nowrap">{title}</p>
       </button>
+    </span>
+  );
+};
+
+const ErrorMessage: React.FC<{ message: string }> = ({ message }) => {
+  return (
+    <span className="flex items-center space-x-2 text-red-400">
+      <TriangleAlert className="size-4" />
+      <p className="text-sm">{message}</p>
     </span>
   );
 };

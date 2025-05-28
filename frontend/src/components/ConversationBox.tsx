@@ -1,5 +1,5 @@
 import { IMessage, Role } from '../types/types';
-import { Sparkle, RotateCcw, TriangleAlert, CircleStop } from 'lucide-react';
+import { Sparkle, RotateCcw, TriangleAlert } from 'lucide-react';
 import Markdown from 'markdown-to-jsx';
 import { useRef, useEffect } from 'react';
 
@@ -25,24 +25,16 @@ const ConversationBox: React.FC<{
       {failed && index === messageList.length - 1 && message.role === Role.user && (
         <span className="flex items-center space-x-2">
           <TriangleAlert className="size-4 text-red-400" />
-          {waiting ? (
-            <CancelButton
-              onClick={() => {
-                aborter.current.abort();
-              }}
-            />
-          ) : (
-            <RetryButton
-              onClick={() => {
-                const handler = () => {
-                  reSendMessage(message.content);
-                  aborter.current = new AbortController();
-                  return;
-                };
-                void handler();
-              }}
-            />
-          )}
+          <RetryButton
+            onClick={() => {
+              const handler = () => {
+                reSendMessage(message.content);
+                aborter.current = new AbortController();
+                return;
+              };
+              void handler();
+            }}
+          />
         </span>
       )}
     </div>
@@ -101,14 +93,6 @@ const MessageBuble: React.FC<{ message: IMessage; updating: boolean }> = ({
         </div>
       )}
     </div>
-  );
-};
-
-const CancelButton: React.FC<{ onClick: () => void }> = ({ onClick }) => {
-  return (
-    <button className="size-6 rounded-lg" onClick={onClick}>
-      <CircleStop className="size-4 text-gray-500 transition-all duration-300 hover:text-gray-400" />
-    </button>
   );
 };
 
