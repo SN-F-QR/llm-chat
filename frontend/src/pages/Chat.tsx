@@ -1,5 +1,5 @@
 import { useParams } from 'react-router';
-import useListMessage from '../service/useListMessage';
+import useListMessage from '../hooks/useListMessage';
 
 import InputBox from '../components/InputBox';
 import ConversationBox from '../components/ConversationBox';

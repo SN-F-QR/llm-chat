@@ -68,13 +68,6 @@ chatRouter.post('/', authMiddleware, async (c) => {
     })
     .returning();
 
-  // Insert the first message
-  // await db.insert(messageTable).values({
-  //   chatId: newChat[0].id,
-  //   content,
-  //   role: Role.user,
-  // });
-
   c.status(201);
   return c.json({
     ...newChat[0],
@@ -112,6 +105,26 @@ chatRouter.get('/', authMiddleware, async (c) => {
   });
 });
 
+chatRouter.delete('/:publicid', zValidator('param', publicIdSchema), authMiddleware, async (c) => {
+  const publicId = c.req.param('publicid');
+  try {
+    const targetChat = await db.query.chatTable.findFirst({
+      where: eq(chatTable.publicId, publicId),
+    });
+    if (targetChat) {
+      const chatId = targetChat.id;
+      await db.delete(messageTable).where(eq(messageTable.chatId, chatId));
+      await db.delete(chatTable).where(eq(chatTable.publicId, publicId));
+    } else {
+      throw new NotFoundError('Chat not exist');
+    }
+  } catch (error) {
+    console.error('Error deleting chat:', error);
+  }
+  c.status(204);
+  return c.text('Chat deleted successfully');
+});
+
 /**
  * Get messages of a chat
  * @route GET /chat/:publicid
@@ -142,6 +155,9 @@ chatRouter.get('/:publicid', zValidator('param', publicIdSchema), authMiddleware
   });
 });
 
+/**
+ * Post a message to a chat and stream llm response
+ */
 chatRouter.post(
   '/:publicid/message',
   zValidator('param', publicIdSchema),

@@ -1,7 +1,7 @@
-import reqClient from './requestClient';
+import reqClient from '../service/requestClient';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { IChat, IMessage, Role } from '../types/types';
-import { useStore } from './chatState';
+import { useStore } from '../service/chatState';
 
 /**
  * Fetch and manage messages

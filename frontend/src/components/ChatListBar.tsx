@@ -1,14 +1,20 @@
 import { MessageCirclePlus, PanelLeftClose } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
-import { IChat } from '../types/types';
-import reqClient from '../service/requestClient';
-import { TriangleAlert } from 'lucide-react';
+import { TriangleAlert, Ellipsis } from 'lucide-react';
 import { useDashboardStore } from '../service/chatState';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
+
+import useListDropMenu from '../hooks/useDropMeun';
+import EditMenu from '../components/DropMenu';
+
+import useChatList from '../hooks/useChatList';
 
 const ChatListBar = () => {
   const { chatid } = useParams<{ chatid: string }>();
+
+  const { dropMenuState, menuPos, activeListItem, focusRef, toggleMenu, closeMenu } =
+    useListDropMenu();
+  const { chatsQuery, chatsMutations } = useChatList();
 
   const expandState = useDashboardStore((state) => state.expandChatList);
   const setExpandState = useDashboardStore((state) => state.setExpand);
@@ -27,19 +33,8 @@ const ChatListBar = () => {
     };
   }, []);
 
-  const chatsQuery = useQuery<IChat[]>({
-    queryKey: ['chats'],
-    queryFn: async () => {
-      if (!reqClient.isLogin) {
-        throw new Error('User is not logged in');
-      }
-      const response = await reqClient.client.get<{ chats: IChat[] }>('/chat');
-      return response.data.chats;
-    },
-  });
-
   const navigate = useNavigate();
-  const handleClick = (publicId: string) => {
+  const handleChatClick = (publicId: string) => {
     void navigate(`/${publicId}`);
   };
 
@@ -49,7 +44,8 @@ const ChatListBar = () => {
       title={chat.title}
       publicId={chat.publicId}
       isActive={chatid === chat.publicId}
-      navigate={handleClick}
+      navigate={handleChatClick}
+      openDropMenu={toggleMenu}
     />
   ));
 
@@ -63,7 +59,7 @@ const ChatListBar = () => {
             title="Start a new chat"
             publicId=""
             isActive={chatid === undefined}
-            navigate={handleClick}
+            navigate={handleChatClick}
           >
             <MessageCirclePlus className="mr-1 size-5 text-gray-700" />
           </ChatListButton>
@@ -77,6 +73,20 @@ const ChatListBar = () => {
         >
           <PanelLeftClose className="size-5 text-gray-500" />
         </button>
+
+        {dropMenuState && activeListItem && (
+          <EditMenu
+            ref={focusRef}
+            topPos={menuPos}
+            handleDelete={() => {
+              chatsMutations.mutate(activeListItem);
+              closeMenu();
+              if (chatid === activeListItem) {
+                void navigate('/');
+              }
+            }}
+          />
+        )}
       </div>
     </div>
   );
@@ -87,19 +97,39 @@ const ChatListButton: React.FC<{
   publicId: string;
   isActive: boolean;
   navigate: (string: string) => void;
+  openDropMenu?: (publicId: string, clickBottom: number) => void;
   children?: React.ReactNode;
-}> = ({ title, publicId, isActive, navigate, children }) => {
+}> = ({ title, publicId, isActive, navigate, children, openDropMenu }) => {
+  const handleDropButtonClick = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    if (!openDropMenu) return;
+    openDropMenu(publicId, rect.bottom);
+  };
+
   return (
     <span className="w-full px-2">
-      <button
-        className={`flex w-full cursor-pointer items-center rounded-2xl px-4 py-2 hover:bg-purple-200 ${isActive ? 'bg-purple-200' : ''} justify-start`}
-        onClick={() => {
-          navigate(publicId);
-        }}
+      <span
+        className={`${isActive ? 'bg-purple-200' : ''} group flex w-full items-center rounded-2xl px-4 hover:bg-purple-200`}
       >
-        {children}
-        <p className="line-clamp-1 text-left">{title}</p>
-      </button>
+        <button
+          className={`flex w-full cursor-pointer items-center justify-start py-2`}
+          onClick={() => {
+            navigate(publicId);
+          }}
+        >
+          {children}
+          <p className="line-clamp-1 text-left">{title}</p>
+        </button>
+
+        {openDropMenu && (
+          <button
+            className="ml-auto hidden size-6 shrink-0 items-center justify-center rounded-full group-hover:flex hover:bg-purple-300"
+            onClick={handleDropButtonClick}
+          >
+            <Ellipsis className="size-4 text-gray-500" />
+          </button>
+        )}
+      </span>
     </span>
   );
 };

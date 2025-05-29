@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router';
 import { useState } from 'react';
 import { IMessage, IChat, Role } from '../types/types';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import useListMessage from '../service/useListMessage';
+import useListMessage from '../hooks/useListMessage';
 import reqClient from '../service/requestClient';
 
 import InputBox from '../components/InputBox';
