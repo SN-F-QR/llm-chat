@@ -49,6 +49,17 @@ const ChatListBar = () => {
     />
   ));
 
+  const dropMenuFcList = {
+    Rename: () => console.log('rename', activeListItem),
+    Delete: () => {
+      if (!activeListItem) return;
+      chatsMutations.mutate(activeListItem);
+      if (chatid === activeListItem) {
+        void navigate('/');
+      }
+    },
+  };
+
   return (
     <div
       className={`enable-animation z-10 h-svh bg-purple-100/50 pt-10 duration-200 ${expandState ? 'translate-x-0' : 'w-0 -translate-x-96'}`}
@@ -78,13 +89,8 @@ const ChatListBar = () => {
           <EditMenu
             ref={focusRef}
             topPos={menuPos}
-            handleDelete={() => {
-              chatsMutations.mutate(activeListItem);
-              closeMenu();
-              if (chatid === activeListItem) {
-                void navigate('/');
-              }
-            }}
+            DropFcList={dropMenuFcList}
+            onClick={closeMenu}
           />
         )}
       </div>
