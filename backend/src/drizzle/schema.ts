@@ -36,6 +36,7 @@ export const chatTable = sqliteTable(
     id: integer('id').primaryKey({ autoIncrement: true }),
     title: text('title').notNull(),
     publicId: text('publicId').notNull(),
+    model: text('model').default('gemini-flash').notNull(),
     ownerId: integer('ownerId')
       .notNull()
       .references(() => userTable.id),

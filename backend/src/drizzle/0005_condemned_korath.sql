@@ -1,0 +1,1 @@
+ALTER TABLE `chat` ADD `model` text DEFAULT 'gemini-flash' NOT NULL;
