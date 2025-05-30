@@ -24,6 +24,7 @@ const NewChat = () => {
     mutationFn: async (content: string) => {
       const response = await reqClient.client.post<IChat>('/chat', {
         content: content,
+        model: 'gemini-flash',
       });
       queryClient.setQueryData<IChat[]>(['chats'], (previous) => {
         if (!previous) {

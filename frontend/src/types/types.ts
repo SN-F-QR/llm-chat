@@ -15,6 +15,7 @@ export interface IUser {
 export interface IChat {
   title: string;
   publicId: string;
+  model: string;
   createdAt: string;
   lastUseAt: string;
 }
