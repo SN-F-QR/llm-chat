@@ -22,6 +22,7 @@ const Chat = () => {
     }, 100);
   };
 
+  // 2nd condition is for the new chat message
   const isWaiting =
     messagesMutate.isPending || messagesQuery.data?.[messagesQuery.data.length - 1]?.content === '';
 

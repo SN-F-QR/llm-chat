@@ -87,9 +87,14 @@ const useListMessage = (chatId: string) => {
       });
       return { oldMessages };
     },
-    onError: (error) => {
+    onError: async (error) => {
       // TODO: filter with ID, mark the failed user message
-      console.error('Error sending message:', error);
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        console.log('Message sending aborted by user');
+      } else {
+        console.error('Error sending message:', error);
+      }
+      await queryClient.invalidateQueries({ queryKey: [chatId, 'messages'] });
     },
   });
 

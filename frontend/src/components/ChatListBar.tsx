@@ -64,19 +64,22 @@ const ChatListBar = () => {
     <div
       className={`enable-animation z-10 h-svh bg-purple-100/50 pt-10 duration-200 ${expandState ? 'translate-x-0' : 'w-0 -translate-x-96'}`}
     >
-      <div className="flex h-full w-72 flex-col p-2 pr-0 md:relative">
-        <div className="scrollbar mb-8 flex h-full flex-col items-start space-y-1 overflow-auto first:mt-2">
-          <ChatListButton
-            title="Start a new chat"
-            publicId=""
-            isActive={chatid === undefined}
-            navigate={handleChatClick}
-          >
-            <MessageCirclePlus className="mr-1 size-5 text-gray-700" />
-          </ChatListButton>
-          <h2 className="mt-2 mb-1 px-2 text-sm text-gray-500">Recent chats</h2>
+      <div className="mt-2 flex h-full w-72 flex-col p-2 pr-0 md:relative">
+        <ChatListButton
+          title="Start a new chat"
+          publicId=""
+          isActive={chatid === undefined}
+          navigate={handleChatClick}
+        >
+          <MessageCirclePlus className="mr-1 size-5 text-gray-700" />
+        </ChatListButton>
+        <span className="my-2 w-64 place-self-center border-b border-gray-300"></span>
+
+        <div className="scrollbar mb-8 flex h-full flex-col-reverse items-start space-y-1 overflow-auto first:mt-2">
+          <div className="min-h-8 grow"></div>
           {chatListComponents}
           {chatsQuery.isError && <ErrorMessage message={chatsQuery.error.message} />}
+          <h2 className="mt-2 mb-1 px-2 text-sm text-gray-500">Recent chats</h2>
         </div>
         <button
           className="absolute bottom-0 left-0 mx-4 my-4 size-5 cursor-pointer text-gray-500"

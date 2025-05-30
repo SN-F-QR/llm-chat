@@ -11,7 +11,6 @@ import ConversationBox from '../components/ConversationBox';
 const NewChat = () => {
   const queryClient = useQueryClient();
   const [tempMessages, setTempMessages] = useState<IMessage[]>([]);
-  const [waiting, setWaiting] = useState<boolean>(false);
   const navigate = useNavigate();
   const newMessage = (role: Role, content: string) => ({
     role,
@@ -48,7 +47,6 @@ const NewChat = () => {
   });
 
   const sendFirstMessage = (content: string) => {
-    setWaiting(true);
     setTempMessages((prev) => [
       ...prev,
       newMessage(Role.user, content),
@@ -56,6 +54,8 @@ const NewChat = () => {
     ]);
     chatsMutate.mutate(content);
   };
+
+  const waiting = chatsMutate.isPending;
 
   return (
     // TODO: Implement the failed message

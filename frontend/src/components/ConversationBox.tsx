@@ -7,7 +7,6 @@ import { useRef, useEffect } from 'react';
  * A box showing the conversation between the user and the assistant
  * @param messageList list of messages to show
  * @param waiting if the assistant is waiting for a response
- * @param streaming if the streaming method is used
  * @param failedMessageId if the last message failed to send
  * @param reSendMessage function to resend the failed message
  */
