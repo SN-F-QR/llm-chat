@@ -65,7 +65,7 @@ const ChatListBar = () => {
       className={`enable-animation z-10 h-svh bg-purple-100/50 pt-10 duration-200 ${expandState ? 'translate-x-0' : 'w-0 -translate-x-96'}`}
     >
       <div className="flex h-full w-72 flex-col p-2 pr-0 md:relative">
-        <div className="scrollbar mb-8 flex flex-col items-start space-y-1 overflow-auto first:mt-2">
+        <div className="scrollbar mb-8 flex h-full flex-col items-start space-y-1 overflow-auto first:mt-2">
           <ChatListButton
             title="Start a new chat"
             publicId=""
@@ -98,6 +98,7 @@ const ChatListBar = () => {
   );
 };
 
+// The button for each chat
 const ChatListButton: React.FC<{
   title: string;
   publicId: string;
@@ -113,7 +114,7 @@ const ChatListButton: React.FC<{
   };
 
   return (
-    <span className="w-full px-2">
+    <span className="group relative w-full px-2">
       <span
         className={`${isActive ? 'bg-purple-200' : ''} group flex w-full items-center rounded-2xl px-4 hover:bg-purple-200`}
       >
@@ -136,6 +137,11 @@ const ChatListButton: React.FC<{
           </button>
         )}
       </span>
+      {openDropMenu && (
+        <div className="hidden group-hover:block">
+          <FullTitle title={title} />
+        </div>
+      )}
     </span>
   );
 };
@@ -145,6 +151,14 @@ const ErrorMessage: React.FC<{ message: string }> = ({ message }) => {
     <span className="flex items-center space-x-2 text-red-400">
       <TriangleAlert className="size-4" />
       <p className="text-sm">{message}</p>
+    </span>
+  );
+};
+
+const FullTitle: React.FC<{ title: string }> = ({ title }) => {
+  return (
+    <span className="absolute z-20 mt-1 mr-2 rounded-md bg-gray-700 px-2 py-1 text-xs text-white">
+      {title}
     </span>
   );
 };
