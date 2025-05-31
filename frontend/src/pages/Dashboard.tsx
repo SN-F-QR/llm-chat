@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Outlet, useNavigate } from 'react-router';
 import NavBar from '../components/NavBar';
 import ChatListBar from '../components/ChatListBar';
@@ -16,6 +16,7 @@ const queryClient = new QueryClient({
 const Dashboard = () => {
   const navigate = useNavigate();
   const [isAuth, setIsAuth] = useState<boolean>(false);
+  const chatListDivRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!localStorage.getItem('token')) {
       void navigate('/auth');
@@ -28,8 +29,8 @@ const Dashboard = () => {
       <NavBar isAuth={isAuth} />
       <QueryClientProvider client={queryClient}>
         <div className="flex w-full">
-          <ChatListBar />
-          {isAuth ? <Outlet /> : <ProtectedRoute />}
+          <ChatListBar scrollRef={chatListDivRef} />
+          {isAuth ? <Outlet context={chatListDivRef} /> : <ProtectedRoute />}
         </div>
       </QueryClientProvider>
       <div className="sticky"></div>

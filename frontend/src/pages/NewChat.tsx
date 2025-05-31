@@ -1,6 +1,7 @@
-import { useNavigate } from 'react-router';
+import { useNavigate, useOutletContext } from 'react-router';
 import { useState } from 'react';
 import { IMessage, IChat, Role } from '../types/types';
+import { useStore } from '../service/chatState';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import useListMessage from '../hooks/useListMessage';
 import reqClient from '../service/requestClient';
@@ -17,6 +18,10 @@ const NewChat = () => {
     content,
     createdAt: Date.now() / 1000,
   });
+
+  // Global state, for showing the loading state in chat list
+  const setIsCreating = useStore((state) => state.setCreatingNewChat);
+  const chatListScrollRef = useOutletContext<React.RefObject<HTMLDivElement | null>>();
   const { messagesMutate } = useListMessage('');
 
   const chatsMutate = useMutation({
@@ -33,7 +38,20 @@ const NewChat = () => {
       });
       return response.data;
     },
+    onMutate: () => {
+      setIsCreating(true);
+      setTimeout(() => {
+        if (chatListScrollRef.current) {
+          const element = chatListScrollRef.current;
+          element.scrollTo({
+            top: -element.scrollHeight,
+            behavior: 'smooth',
+          });
+        }
+      }, 100);
+    },
     onSuccess: (data, variables) => {
+      setIsCreating(false);
       const { publicId } = data;
       messagesMutate.mutate({
         message: variables,
