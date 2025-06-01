@@ -6,7 +6,6 @@ import { Trash2, PenLine, FolderHeart } from 'lucide-react';
  * @param topPos - The distance to from top of menu to the screen edge.
  * @param DropFcList - A record of functions to be executed when a menu item is clicked.
  * @param onClick - An optional callback function to be called when a menu item is clicked.
- *
  */
 const EditMenu: React.FC<{
   ref: React.RefObject<HTMLDivElement | null>;
@@ -51,7 +50,7 @@ const EditMenu: React.FC<{
   return (
     <div
       ref={ref}
-      className="fixed right-4 z-20 mt-3 flex min-w-24 flex-col space-y-1 overflow-hidden rounded-2xl border border-purple-200 bg-purple-100 py-1 text-sm text-gray-700 shadow-sm"
+      className="fixed right-4 z-20 mt-3 flex min-w-24 flex-col space-y-1 overflow-hidden rounded-lg border border-purple-200 bg-purple-100 py-1 text-sm text-gray-700 shadow-sm"
       style={{ top: `${topPos}px` }}
     >
       {DropLists}

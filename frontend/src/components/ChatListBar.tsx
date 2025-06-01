@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { TriangleAlert, Ellipsis } from 'lucide-react';
 import { useDashboardStore } from '../service/chatState';
 import { useStore } from '../service/chatState';
-import React, { use, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 import useListDropMenu from '../hooks/useDropMeun';
 import EditMenu from '../components/DropMenu';
@@ -73,7 +73,7 @@ const ChatListBar: React.FC<{ scrollRef: React.RefObject<HTMLDivElement | null> 
 
   return (
     <div
-      className={`enable-animation z-10 h-svh bg-purple-100/50 pt-10 duration-200 ${expandState ? 'translate-x-0' : 'w-0 -translate-x-96'}`}
+      className={`enable-animation z-10 h-svh bg-purple-50 pt-10 duration-200 ${expandState ? 'translate-x-0' : 'w-0 -translate-x-96'}`}
     >
       <div className="mt-2 flex h-full w-72 flex-col p-2 pr-0 md:relative">
         <ChatListButton

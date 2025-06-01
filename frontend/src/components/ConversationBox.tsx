@@ -1,7 +1,8 @@
 import { IMessage, Role } from '../types/types';
 import { Sparkle, RotateCcw, TriangleAlert } from 'lucide-react';
-import Markdown from 'markdown-to-jsx';
+import Markdown, { type MarkdownToJSX } from 'markdown-to-jsx';
 import { useRef, useEffect } from 'react';
+import { codeToHtml } from 'shiki';
 
 /**
  * A box showing the conversation between the user and the assistant
@@ -52,29 +53,57 @@ const MessageBuble: React.FC<{ message: IMessage; updating: boolean }> = ({
   updating,
 }) => {
   const SyntaxHighlightedCode = (props: React.HTMLAttributes<HTMLElement>) => {
-    const ref = useRef<HTMLElement | null>(null);
-
+    const ref = useRef<HTMLPreElement | null>(null);
     useEffect(() => {
-      if (ref.current && props.className?.includes('lang-') && window.hljs && !updating) {
-        // use auto detection and avoid directly using highlightElement
-        const highlighted: { value: string } = window.hljs.highlightAuto(
-          ref.current.innerText ?? ''
-        );
-        ref.current.innerHTML = highlighted.value;
-
-        // hljs won't reprocess the element unless this attribute is removed
-        ref.current.removeAttribute('data-highlighted');
-      }
+      const highlightCode = async () => {
+        if (ref.current && !updating) {
+          const codeChildren = ref.current.children[0].className;
+          if (codeChildren.includes('lang-')) {
+            const language = codeChildren.split('lang-')[1];
+            const childrenText = ref.current.children[0].textContent;
+            const highlighted = await codeToHtml(childrenText ?? '', {
+              lang: language,
+              theme: 'catppuccin-latte',
+            });
+            const codeElement = highlighted.replace(/<pre[^>]*>|<\/pre>/g, '');
+            ref.current.innerHTML = codeElement;
+          }
+        }
+      };
+      void highlightCode();
     }, [props.className, props.children]);
 
-    // add hljs class to change the background color
-    return <code {...props} className={`${props.className} hljs rounded-2xl text-sm`} ref={ref} />;
+    // useEffect(() => {
+    //   if (ref.current && props.className?.includes('lang-') && window.hljs && !updating) {
+    //     // use auto detection and avoid directly using highlightElement
+    //     const highlighted: { value: string } = window.hljs.highlightAuto(
+    //       ref.current.innerText ?? ''
+    //     );
+    //     ref.current.innerHTML = highlighted.value;
+
+    //     // hljs won't reprocess the element unless this attribute is removed
+    //     ref.current.removeAttribute('data-highlighted');
+    //   }
+    // }, [props.className, props.children]);
+
+    // markdown-to-jsx convert ``` to <pre> and <code> tags, so handle the pre
+    return (
+      <pre
+        {...props}
+        className={`my-4 rounded-lg bg-[#f6f8ff] p-4 text-sm whitespace-pre-wrap`}
+        ref={ref}
+      />
+    );
+  };
+
+  const markDownStyle: MarkdownToJSX.Overrides = {
+    pre: SyntaxHighlightedCode,
   };
 
   return (
     <div className="flex w-full">
       {message.role === Role.user ? (
-        <div className="max-w-lg rounded-lg bg-purple-400 p-2 text-white">
+        <div className="max-w-lg rounded-lg rounded-br-2xl bg-purple-100 px-4 py-2 text-gray-800">
           <p>{message.content}</p>
         </div>
       ) : message.content === '' && updating ? (
@@ -82,12 +111,10 @@ const MessageBuble: React.FC<{ message: IMessage; updating: boolean }> = ({
       ) : (
         <div className="flex w-full">
           <div className="py-2">
-            <Sparkle className="size-6 text-purple-600" />
+            <Sparkle className="size-6 text-indigo-400" />
           </div>
           <div className="w-full p-2 break-words">
-            <Markdown options={{ overrides: { code: SyntaxHighlightedCode } }}>
-              {message.content}
-            </Markdown>
+            <Markdown options={{ overrides: markDownStyle }}>{message.content}</Markdown>
           </div>
         </div>
       )}
