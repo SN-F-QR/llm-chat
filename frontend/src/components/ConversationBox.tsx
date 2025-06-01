@@ -90,7 +90,7 @@ const MessageBuble: React.FC<{ message: IMessage; updating: boolean }> = ({
     return (
       <pre
         {...props}
-        className={`my-4 rounded-lg bg-[#f6f8ff] p-4 text-sm whitespace-pre-wrap`}
+        className={`scrollbar my-4 overflow-auto rounded-lg bg-purple-50 p-4 text-sm`}
         ref={ref}
       />
     );
@@ -111,7 +111,7 @@ const MessageBuble: React.FC<{ message: IMessage; updating: boolean }> = ({
       ) : (
         <div className="flex w-full">
           <div className="py-2">
-            <Sparkle className="size-6 text-indigo-400" />
+            <Sparkle className="size-6 text-purple-400" />
           </div>
           <div className="w-full p-2 break-words">
             <Markdown options={{ overrides: markDownStyle }}>{message.content}</Markdown>
