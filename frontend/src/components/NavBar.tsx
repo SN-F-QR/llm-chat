@@ -1,35 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { LogOut, Menu } from 'lucide-react';
 import reqClient from '../service/requestClient';
 import { IUser } from '../types/types';
 import { useDashboardStore } from '../service/chatState';
+import { useQuery } from '@tanstack/react-query';
 
 const NavBar: React.FC<{ isAuth: boolean }> = ({ isAuth }) => {
-  const [user, setUser] = useState<IUser | undefined>(undefined);
   const [hover, setHover] = useState(false);
   const expandState = useDashboardStore((state) => state.expandChatList);
   const setExpandState = useDashboardStore((state) => state.setExpand);
-  useEffect(() => {
-    const loginUser = async () => {
-      try {
-        if (!reqClient.isLogin) {
-          return;
-        }
-        const response = await reqClient.client.get<IUser>('/user/me');
-        setUser(response.data);
-        console.log('setting user');
-      } catch (error) {
-        console.error('Error fetching user data:', error);
+
+  const userQuery = useQuery({
+    queryKey: ['user'],
+    queryFn: async () => {
+      if (!reqClient.isLogin) {
+        return undefined;
       }
-    };
-    void loginUser();
-  }, [isAuth]);
+      const response = await reqClient.client.get<IUser>('/user/me');
+      return response.data;
+    },
+    enabled: isAuth,
+  });
 
   const logout = async () => {
     try {
       await reqClient.logout();
-      console.log('Logout successful');
-      setUser(undefined);
       window.location.reload();
     } catch (error) {
       console.error(error);
@@ -68,7 +63,7 @@ const NavBar: React.FC<{ isAuth: boolean }> = ({ isAuth }) => {
           </div>
 
           <div className="flex size-8 items-center justify-center rounded-full bg-amber-400">
-            <p className="cursor-default text-white/90">{user?.name[0].toUpperCase()}</p>
+            <p className="cursor-default text-white/90">{userQuery.data?.name[0].toUpperCase()}</p>
           </div>
         </span>
       </div>

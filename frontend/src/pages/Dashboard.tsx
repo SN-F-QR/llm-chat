@@ -26,8 +26,8 @@ const Dashboard = () => {
 
   return (
     <div className="relative h-full max-h-screen w-full overflow-hidden">
-      <NavBar isAuth={isAuth} />
       <QueryClientProvider client={queryClient}>
+        <NavBar isAuth={isAuth} />
         <div className="flex w-full">
           <ChatListBar scrollRef={chatListDivRef} />
           {isAuth ? <Outlet context={chatListDivRef} /> : <ProtectedRoute />}
