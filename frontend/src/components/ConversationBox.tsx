@@ -73,31 +73,33 @@ const MessageBuble: React.FC<{ message: IMessage; updating: boolean }> = ({
       void highlightCode();
     }, [props.className, props.children]);
 
-    // useEffect(() => {
-    //   if (ref.current && props.className?.includes('lang-') && window.hljs && !updating) {
-    //     // use auto detection and avoid directly using highlightElement
-    //     const highlighted: { value: string } = window.hljs.highlightAuto(
-    //       ref.current.innerText ?? ''
-    //     );
-    //     ref.current.innerHTML = highlighted.value;
-
-    //     // hljs won't reprocess the element unless this attribute is removed
-    //     ref.current.removeAttribute('data-highlighted');
-    //   }
-    // }, [props.className, props.children]);
-
-    // markdown-to-jsx convert ``` to <pre> and <code> tags, so handle the pre
     return (
       <pre
         {...props}
-        className={`scrollbar my-4 overflow-auto rounded-lg bg-purple-50 p-4 text-sm`}
+        className={`lang scrollbar my-4 overflow-auto rounded-lg bg-purple-50 p-4 text-sm`}
         ref={ref}
       />
     );
   };
 
   const markDownStyle: MarkdownToJSX.Overrides = {
+    p: mdClassOption('mb-2'),
+    strong: mdClassOption('font-semibold'),
+    ol: mdClassOption('list-decimal ml-2 mb-4'),
+    ul: mdClassOption('list-disc ml-2 mb-4'),
+    li: mdClassOption('ml-4 mb-1 first:mt-2'),
+    hr: mdClassOption('my-4 mx-8 border-t border-gray-300'),
     pre: SyntaxHighlightedCode,
+    code: (props: React.HTMLAttributes<HTMLElement>) => {
+      // Code will be converted first, we keep the className (lang-xxx) for those within the code block
+      // then they within pre is handled by shiki
+      return (
+        <code
+          {...props}
+          className={`rounded bg-purple-50 px-1 py-0.5 font-mono text-sm font-normal text-violet-400 ${props.className}`}
+        />
+      );
+    },
   };
 
   return (
@@ -113,7 +115,7 @@ const MessageBuble: React.FC<{ message: IMessage; updating: boolean }> = ({
           <div className="py-2">
             <Sparkle className="size-6 text-purple-400" />
           </div>
-          <div className="w-full p-2 break-words">
+          <div className="w-full p-2 break-words text-gray-800">
             <Markdown options={{ overrides: markDownStyle }}>{message.content}</Markdown>
           </div>
         </div>
@@ -144,5 +146,11 @@ const LoadingMessage: React.FC = () => {
     </div>
   );
 };
+
+const mdClassOption = (className: string) => ({
+  props: {
+    className: className,
+  },
+});
 
 export default ConversationBox;
