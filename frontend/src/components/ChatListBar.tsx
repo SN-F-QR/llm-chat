@@ -103,7 +103,7 @@ const ChatListBar: React.FC<{ scrollRef: React.RefObject<HTMLDivElement | null> 
           <h2 className="mt-2 mb-1 px-2 text-sm text-gray-500">Recent chats</h2>
         </div>
         <button
-          className="absolute bottom-0 left-0 mx-4 my-4 size-5 cursor-pointer text-gray-500"
+          className="absolute bottom-0 left-0 mx-4 my-4 size-5 cursor-pointer text-gray-400"
           onClick={() => setExpandState(!expandState)}
         >
           <PanelLeftClose className="size-5 text-gray-500" />
