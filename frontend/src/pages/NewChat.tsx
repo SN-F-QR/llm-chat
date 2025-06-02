@@ -12,6 +12,7 @@ import ConversationBox from '../components/ConversationBox';
 const NewChat = () => {
   const queryClient = useQueryClient();
   const [tempMessages, setTempMessages] = useState<IMessage[]>([]);
+  const [model, setModel] = useState<string>('gemini-flash');
   const navigate = useNavigate();
   const newMessage = (role: Role, content: string) => ({
     role,
@@ -28,7 +29,7 @@ const NewChat = () => {
     mutationFn: async (content: string) => {
       const response = await reqClient.client.post<IChat>('/chat', {
         content: content,
-        model: 'gemini-flash',
+        model: model,
       });
       queryClient.setQueryData<IChat[]>(['chats'], (previous) => {
         if (!previous) {
@@ -86,7 +87,7 @@ const NewChat = () => {
       />
       <div className="sticky bottom-8 flex w-full flex-col items-center px-4">
         <div className="w-full max-w-3xl">
-          <InputBox submitFunc={sendFirstMessage} waiting={waiting} />
+          <InputBox submitFunc={sendFirstMessage} waiting={waiting} setModel={setModel} />
         </div>
       </div>
     </div>

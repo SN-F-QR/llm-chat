@@ -1,14 +1,18 @@
 import { SendHorizontal, CircleStop } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useStore } from '../service/chatState';
+import SelectForm from './SelectForm';
 
 const InputBox: React.FC<{
   submitFunc: (arg: string) => void;
   waiting: boolean;
-}> = ({ submitFunc, waiting }) => {
+  currentModel?: string;
+  setModel?: (model: string) => void;
+}> = ({ submitFunc, waiting, currentModel, setModel }) => {
   const [text, setText] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [isComposing, setIsComposing] = useState<boolean>(false);
+
   const aborter = useStore((state) => state.abortController);
   const resetAborter = useStore((state) => state.resetAbort);
 
@@ -55,8 +59,9 @@ const InputBox: React.FC<{
           }}
           className="mb-2 grow resize-none overflow-y-auto pr-2 font-sans placeholder:text-gray-400 placeholder:italic focus:outline-none"
         ></textarea>
-        <span className="flex items-center justify-between">
-          <span></span>
+        <span className="flex items-end justify-between space-x-2">
+          {/* <span className="flex-grow"></span> */}
+          <ModelSelection currentModel={currentModel} setModel={setModel} />
           {waiting ? (
             <button
               onClick={() => {
@@ -84,3 +89,35 @@ const InputBox: React.FC<{
   );
 };
 export default InputBox;
+
+// Display the current model or a selection dropdown for model choice (in new chat)
+const ModelSelection: React.FC<{ currentModel?: string; setModel?: (model: string) => void }> = ({
+  currentModel,
+  setModel,
+}) => {
+  if (!setModel && !currentModel) {
+    return null;
+  }
+
+  return (
+    <div>
+      {currentModel ? (
+        <p className="rounded-full bg-purple-200 px-2 py-1 text-xs text-gray-800">
+          {currentModel
+            .split('-')
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')}
+        </p>
+      ) : (
+        <SelectForm
+          formName="model"
+          onChange={setModel}
+          options={[
+            { name: 'Gemini Flash', value: 'gemini-flash' },
+            { name: 'Gemini Pro', value: 'gemini-pro' },
+          ]}
+        />
+      )}
+    </div>
+  );
+};

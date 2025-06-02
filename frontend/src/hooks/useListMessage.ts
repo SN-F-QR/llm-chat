@@ -9,6 +9,10 @@ import { useStore } from '../service/chatState';
 const useListMessage = (chatId: string) => {
   const queryClient = useQueryClient();
 
+  const chatInfo = queryClient
+    .getQueryData<IChat[]>(['chats'])
+    ?.find((chat) => chat.publicId === chatId);
+
   const updateMessage = (message: string, chatId: string) => {
     queryClient.setQueryData<IMessage[]>([chatId, 'messages'], (previous) => {
       if (!previous) {
@@ -99,6 +103,7 @@ const useListMessage = (chatId: string) => {
   });
 
   return {
+    chatInfo,
     messagesQuery,
     messagesMutate,
   };

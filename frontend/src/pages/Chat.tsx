@@ -7,7 +7,7 @@ import ConversationBox from '../components/ConversationBox';
 
 const Chat = () => {
   const { chatid } = useParams<{ chatid: string }>();
-  const { messagesQuery, messagesMutate } = useListMessage(chatid!);
+  const { chatInfo, messagesQuery, messagesMutate } = useListMessage(chatid!);
   const chatDivRef = useRef<HTMLDivElement>(null);
 
   const sendNewMessage = (content: string) => {
@@ -39,7 +39,11 @@ const Chat = () => {
       />
       <div className="sticky bottom-8 flex w-full flex-col items-center px-4">
         <div className="w-full max-w-3xl">
-          <InputBox submitFunc={sendNewMessage} waiting={isWaiting} />
+          <InputBox
+            submitFunc={sendNewMessage}
+            waiting={isWaiting}
+            currentModel={chatInfo?.model}
+          />
         </div>
       </div>
     </div>

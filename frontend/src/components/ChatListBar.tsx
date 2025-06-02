@@ -172,7 +172,7 @@ const ChatListButton: React.FC<{
 
 const ErrorMessage: React.FC<{ message: string }> = ({ message }) => {
   return (
-    <span className="flex items-center space-x-2 text-red-400">
+    <span className="ml-4 flex items-center space-x-2 text-red-400">
       <TriangleAlert className="size-4" />
       <p className="text-sm">{message}</p>
     </span>
