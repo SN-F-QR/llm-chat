@@ -43,7 +43,7 @@ const InputBox: React.FC<{
 
   return (
     <div className="w-full rounded-2xl border border-gray-200 bg-white/80 p-4 shadow-lg shadow-purple-100 backdrop-blur-3xl">
-      <div className="flex max-h-72 min-h-20 w-full flex-col justify-between overflow-hidden">
+      <div className="flex max-h-72 min-h-20 w-full flex-col justify-between">
         <textarea
           ref={textAreaRef}
           name="messageInput"
@@ -110,11 +110,21 @@ const ModelSelection: React.FC<{ currentModel?: string; setModel?: (model: strin
         </p>
       ) : (
         <SelectForm
+          className="w-72 text-xs"
           formName="model"
           onChange={setModel}
           options={[
-            { name: 'Gemini Flash', value: 'gemini-flash' },
-            { name: 'Gemini Pro', value: 'gemini-pro' },
+            {
+              name: 'Gemini Flash',
+              value: 'gemini-flash',
+              description: 'Fast and efficient model from Google',
+            },
+            {
+              name: 'Gemini Pro',
+              value: 'gemini-pro',
+              description:
+                'Advanced model with more capabilities from Google, suitable for complex tasks',
+            },
           ]}
         />
       )}
