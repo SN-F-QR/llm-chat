@@ -42,7 +42,7 @@ const NavBar: React.FC<{ isAuth: boolean }> = ({ isAuth }) => {
             {!expandState && <Menu className="size-5" />}
           </button>
           <img className="size-8 rounded-full" src="/logo.jpeg" alt="Logo" />
-          <h1 className="cursor-default text-lg font-semibold">LLM Chat</h1>
+          <h1 className="text-lg font-semibold select-none">LLM Chat</h1>
         </span>
         <span
           className="flex items-center space-x-2"
@@ -63,7 +63,7 @@ const NavBar: React.FC<{ isAuth: boolean }> = ({ isAuth }) => {
           </div>
 
           <div className="flex size-8 items-center justify-center rounded-full bg-amber-400">
-            <p className="cursor-default text-white/90">{userQuery.data?.name[0].toUpperCase()}</p>
+            <p className="text-white/90 select-none">{userQuery.data?.name[0].toUpperCase()}</p>
           </div>
         </span>
       </div>

@@ -103,11 +103,8 @@ const ModelSelection: React.FC<{ currentModel: string; setModel?: (model: string
   return (
     <div>
       {!setModel ? (
-        <p className="rounded-full bg-purple-200 px-2 py-1 text-xs text-gray-800">
-          {currentModel
-            .split('-')
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ')}
+        <p className="rounded-full bg-purple-200 px-2 py-1 text-xs text-gray-800 select-none">
+          {models[currentModel].name}
         </p>
       ) : (
         <SelectForm
