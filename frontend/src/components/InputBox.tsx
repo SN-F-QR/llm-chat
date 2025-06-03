@@ -7,7 +7,7 @@ import { models } from '../service/models';
 const InputBox: React.FC<{
   submitFunc: (arg: string) => void;
   waiting: boolean;
-  currentModel: string;
+  currentModel?: string;
   setModel?: (model: string) => void;
 }> = ({ submitFunc, waiting, currentModel, setModel }) => {
   const [text, setText] = useState<string>('');
@@ -96,25 +96,30 @@ export default InputBox;
  * @param currentModel - The current model 'value' (key)
  * @param setModel - Optional function to set the model, if provided, it will render a select form
  */
-const ModelSelection: React.FC<{ currentModel: string; setModel?: (model: string) => void }> = ({
+const ModelSelection: React.FC<{ currentModel?: string; setModel?: (model: string) => void }> = ({
   currentModel,
   setModel,
 }) => {
-  return (
-    <div>
-      {!setModel ? (
-        <p className="rounded-full bg-purple-200 px-2 py-1 text-xs text-gray-800 select-none">
-          {models[currentModel].name}
-        </p>
-      ) : (
-        <SelectForm
-          className="w-72 text-xs"
-          formName="model"
-          value={currentModel}
-          onChange={setModel}
-          options={models}
-        />
-      )}
-    </div>
-  );
+  if (!currentModel) {
+    return (
+      <p className="rounded-full bg-purple-200 px-2 py-1 text-xs text-gray-800 select-none">...</p>
+    );
+  } else
+    return (
+      <div>
+        {!setModel ? (
+          <p className="rounded-full bg-purple-200 px-2 py-1 text-xs text-gray-800 select-none">
+            {models[currentModel].name}
+          </p>
+        ) : (
+          <SelectForm
+            className="w-72 text-xs"
+            formName="model"
+            value={currentModel}
+            onChange={setModel}
+            options={models}
+          />
+        )}
+      </div>
+    );
 };

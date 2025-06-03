@@ -42,7 +42,7 @@ const Chat = () => {
           <InputBox
             submitFunc={sendNewMessage}
             waiting={isWaiting}
-            currentModel={chatInfo!.model}
+            currentModel={chatInfo?.model}
           />
         </div>
       </div>
