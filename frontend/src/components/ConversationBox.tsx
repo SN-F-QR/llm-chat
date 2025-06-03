@@ -85,6 +85,10 @@ const MessageBuble: React.FC<{ message: IMessage; updating: boolean }> = ({
   const markDownStyle: MarkdownToJSX.Overrides = {
     p: mdClassOption('mb-2'),
     strong: mdClassOption('font-semibold'),
+    table: mdClassOption('table-auto bg-purple-50 my-4 rounded-xl overflow-hidden text-sm'),
+    thead: mdClassOption('bg-purple-100'),
+    th: mdClassOption('p-2 text-gray-700'),
+    td: mdClassOption('py-1 px-2 text-gray-600'),
     ol: mdClassOption('list-decimal ml-2 mb-4'),
     ul: mdClassOption('list-disc ml-2 mb-4'),
     li: mdClassOption('ml-4 mb-1 first:mt-2'),
@@ -96,7 +100,7 @@ const MessageBuble: React.FC<{ message: IMessage; updating: boolean }> = ({
       return (
         <code
           {...props}
-          className={`rounded bg-purple-50 px-1 py-0.5 font-mono text-sm font-normal text-violet-400 ${props.className}`}
+          className={`rounded bg-purple-100 px-1 py-0.5 font-mono text-sm font-normal text-violet-400 ${props.className}`}
         />
       );
     },
