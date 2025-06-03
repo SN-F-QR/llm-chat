@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 
 @theme {
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'Maple Mono CN', monospace;
   --color-indigo-light: #f0f4f8;
 }
 
