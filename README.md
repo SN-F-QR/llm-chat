@@ -19,6 +19,7 @@ A full-stack simple chat system for LLMs
 - React + Vite
 - Tailwindcss
 - Shiki
+- TanStack Query
 
 ## Current Features (WIP)
 

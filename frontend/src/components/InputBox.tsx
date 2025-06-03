@@ -2,11 +2,12 @@ import { SendHorizontal, CircleStop } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useStore } from '../service/chatState';
 import SelectForm from './SelectForm';
+import { models } from '../service/models';
 
 const InputBox: React.FC<{
   submitFunc: (arg: string) => void;
   waiting: boolean;
-  currentModel?: string;
+  currentModel: string;
   setModel?: (model: string) => void;
 }> = ({ submitFunc, waiting, currentModel, setModel }) => {
   const [text, setText] = useState<string>('');
@@ -90,18 +91,18 @@ const InputBox: React.FC<{
 };
 export default InputBox;
 
-// Display the current model or a selection dropdown for model choice (in new chat)
-const ModelSelection: React.FC<{ currentModel?: string; setModel?: (model: string) => void }> = ({
+/**
+ * Become select form when setModel is provided, or just display the current model name
+ * @param currentModel - The current model 'value' (key)
+ * @param setModel - Optional function to set the model, if provided, it will render a select form
+ */
+const ModelSelection: React.FC<{ currentModel: string; setModel?: (model: string) => void }> = ({
   currentModel,
   setModel,
 }) => {
-  if (!setModel && !currentModel) {
-    return null;
-  }
-
   return (
     <div>
-      {currentModel ? (
+      {!setModel ? (
         <p className="rounded-full bg-purple-200 px-2 py-1 text-xs text-gray-800">
           {currentModel
             .split('-')
@@ -112,20 +113,9 @@ const ModelSelection: React.FC<{ currentModel?: string; setModel?: (model: strin
         <SelectForm
           className="w-72 text-xs"
           formName="model"
+          value={currentModel}
           onChange={setModel}
-          options={[
-            {
-              name: 'Gemini Flash',
-              value: 'gemini-flash',
-              description: 'Fast and efficient model from Google',
-            },
-            {
-              name: 'Gemini Pro',
-              value: 'gemini-pro',
-              description:
-                'Advanced model with more capabilities from Google, suitable for complex tasks',
-            },
-          ]}
+          options={models}
         />
       )}
     </div>

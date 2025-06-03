@@ -1,7 +1,7 @@
 import { useNavigate, useOutletContext } from 'react-router';
 import { useState } from 'react';
 import { IMessage, IChat, Role } from '../types/types';
-import { useStore } from '../service/chatState';
+import { useStore, useUserPreferences } from '../service/chatState';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import useListMessage from '../hooks/useListMessage';
 import reqClient from '../service/requestClient';
@@ -12,7 +12,8 @@ import ConversationBox from '../components/ConversationBox';
 const NewChat = () => {
   const queryClient = useQueryClient();
   const [tempMessages, setTempMessages] = useState<IMessage[]>([]);
-  const [model, setModel] = useState<string>('gemini-flash');
+  const { model, setModel } = useUserPreferences();
+
   const navigate = useNavigate();
   const newMessage = (role: Role, content: string) => ({
     role,
@@ -87,7 +88,12 @@ const NewChat = () => {
       />
       <div className="sticky bottom-8 flex w-full flex-col items-center px-4">
         <div className="w-full max-w-3xl">
-          <InputBox submitFunc={sendFirstMessage} waiting={waiting} setModel={setModel} />
+          <InputBox
+            submitFunc={sendFirstMessage}
+            waiting={waiting}
+            currentModel={model}
+            setModel={setModel}
+          />
         </div>
       </div>
     </div>

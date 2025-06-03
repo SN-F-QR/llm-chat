@@ -4,11 +4,12 @@ import { ChevronsUpDown, Check } from 'lucide-react';
 const SelectForm: React.FC<{
   className?: string;
   formName: string;
+  value: string;
   onChange?: (value: string) => void;
-  options: { name: string; value: string; description?: string }[];
-}> = ({ className, formName, onChange, options }) => {
+  options: Record<string, { name: string; description?: string }>;
+}> = ({ className, formName, value, onChange, options }) => {
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
-  const [currentOptionName, setCurrentOptionName] = useState<string>(options[0].name); // only for self display
+  const currentOptionName = options[value].name;
 
   return (
     <div className={`relative ${className}`}>
@@ -23,27 +24,27 @@ const SelectForm: React.FC<{
       </button>
       {isSelecting && (
         <OptionList>
-          {options.map((option) => (
+          {Object.keys(options).map((optionValue) => (
             <OptionItem
-              key={`${formName}-${option.name}`}
+              key={`${formName}-${optionValue}`}
               onClick={() => {
                 setIsSelecting(false);
-                setCurrentOptionName(option.name);
+                // setCurrentOptionName(options[optionValue].name);
                 if (onChange) {
-                  onChange(option.value);
+                  onChange(optionValue);
                 }
               }}
             >
               <div className="flex w-full items-center justify-between space-x-2">
                 <div className="flex flex-col text-left">
-                  {option.name}
-                  {option.description && (
-                    <span className="text-left text-xs text-gray-500">{option.description}</span>
+                  {options[optionValue].name}
+                  {options[optionValue].description && (
+                    <span className="text-left text-xs text-gray-500">
+                      {options[optionValue].description}
+                    </span>
                   )}
                 </div>
-                {option.name === currentOptionName && (
-                  <Check className="size-4 shrink-0 text-purple-500" />
-                )}
+                {optionValue === value && <Check className="size-4 shrink-0 text-purple-500" />}
               </div>
             </OptionItem>
           ))}
