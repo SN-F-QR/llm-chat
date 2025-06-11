@@ -4,7 +4,7 @@ import { streamText } from 'hono/streaming';
 import db from '../database';
 import { eq, and, sql } from 'drizzle-orm';
 import { chatTable, messageTable, Role, userTable } from '../drizzle/schema';
-import { authMiddleware } from './authRouter';
+import { authMiddleware, AuthMiddleEnv } from './authRouter';
 import { nanoid } from 'nanoid';
 import { zValidator } from '@hono/zod-validator';
 import z from 'zod';
@@ -14,7 +14,7 @@ import { FinishReason } from '@google/genai';
 
 import NotFoundError from '../error/NotFoundError';
 
-const chatRouter = new Hono();
+const chatRouter = new Hono<AuthMiddleEnv>();
 const nanoSize = 21;
 
 const chatSchema = z.object({
@@ -30,6 +30,8 @@ const publicIdSchema = z.object({
   publicid: z.string().length(nanoSize, 'Public ID must be exactly 21 characters long'),
 });
 
+chatRouter.use('*', authMiddleware);
+
 /**
  * Creates a new chat list
  * @route POST /chat
@@ -37,7 +39,7 @@ const publicIdSchema = z.object({
  * @param {string} model
  * @return a chat info object
  */
-chatRouter.post('/', authMiddleware, zValidator('json', chatSchema), async (c) => {
+chatRouter.post('/', zValidator('json', chatSchema), async (c) => {
   const { id: userId } = c.get('user');
   const { content, model }: { content: string; model: string } = await c.req.json();
   const title = await generateTitle(content);
@@ -63,7 +65,7 @@ chatRouter.post('/', authMiddleware, zValidator('json', chatSchema), async (c) =
   });
 });
 
-chatRouter.get('/', authMiddleware, async (c) => {
+chatRouter.get('/', async (c) => {
   const { id } = c.get('user');
   const chatAndTag = await db.query.userTable.findFirst({
     where: eq(userTable.id, id),
@@ -82,10 +84,7 @@ chatRouter.get('/', authMiddleware, async (c) => {
     },
   });
 
-  if (!chatAndTag) {
-    throw new NotFoundError('User not exist');
-  }
-  const { chats, tags } = chatAndTag;
+  const { chats, tags } = chatAndTag!;
   c.status(200);
   return c.json({
     chats: chats,
@@ -93,7 +92,7 @@ chatRouter.get('/', authMiddleware, async (c) => {
   });
 });
 
-chatRouter.delete('/:publicid', zValidator('param', publicIdSchema), authMiddleware, async (c) => {
+chatRouter.delete('/:publicid', zValidator('param', publicIdSchema), async (c) => {
   const publicId = c.req.param('publicid');
   try {
     const targetChat = await db.query.chatTable.findFirst({
@@ -119,7 +118,7 @@ chatRouter.delete('/:publicid', zValidator('param', publicIdSchema), authMiddlew
  * @param {string} publicid - The public ID of the chat
  * @return {object} - The chat info and messages
  */
-chatRouter.get('/:publicid', zValidator('param', publicIdSchema), authMiddleware, async (c) => {
+chatRouter.get('/:publicid', zValidator('param', publicIdSchema), async (c) => {
   const publicId = c.req.param('publicid');
   const chat = await db.query.chatTable.findFirst({
     where: and(eq(chatTable.publicId, publicId), eq(chatTable.ownerId, c.get('user').id)),
@@ -149,7 +148,6 @@ chatRouter.get('/:publicid', zValidator('param', publicIdSchema), authMiddleware
 chatRouter.post(
   '/:publicid/message',
   zValidator('param', publicIdSchema),
-  authMiddleware,
   zValidator('json', messageSchema),
   async (c) => {
     const { content } = c.req.valid('json');

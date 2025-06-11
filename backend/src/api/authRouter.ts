@@ -12,7 +12,13 @@ import bcrypt from 'bcryptjs';
 import NotFoundError from '../error/NotFoundError';
 import UnauthorizedError from '../error/UnauthorizedError';
 
-const authRouter = new Hono();
+export interface AuthMiddleEnv {
+  Variables: {
+    user: User;
+  };
+}
+
+const authRouter = new Hono<AuthMiddleEnv>();
 
 const loginSchema = z.object({
   stuNum: z.string().length(8),
