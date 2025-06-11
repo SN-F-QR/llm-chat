@@ -3,6 +3,7 @@ import llmRouter from './api/llmRouter';
 import userRouter from './api/userRouter';
 import authRouter from './api/authRouter';
 import chatRouter from './api/chatRouter';
+import promptRouter from './api/promptRouter';
 
 import ConflictError from './error/ConflictError';
 import NotFoundError from './error/NotFoundError';
@@ -15,6 +16,7 @@ apiRouter.route('/llm', llmRouter);
 apiRouter.route('/user', userRouter);
 apiRouter.route('/auth', authRouter);
 apiRouter.route('/chat', chatRouter);
+apiRouter.route('/prompt', promptRouter);
 
 apiRouter.onError((err, c) => {
   if (

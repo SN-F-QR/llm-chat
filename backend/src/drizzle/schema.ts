@@ -62,6 +62,21 @@ export const messageTable = sqliteTable('message', {
     .notNull(),
 });
 
+export const promptTable = sqliteTable(
+  'prompt',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    publicId: text('publicId').notNull(),
+    name: text('name').notNull(),
+    content: text('content').notNull(),
+    ownerId: integer('ownerId')
+      .notNull()
+      .references(() => userTable.id),
+    category: text('category').notNull().default('default'),
+  },
+  (table) => [index('public_prompt_idx').on(table.publicId)]
+);
+
 export const tagTable = sqliteTable('tag', {
   name: text('name').notNull().primaryKey(),
   ownerId: integer('ownerId')
@@ -85,6 +100,7 @@ export const tagToChatTable = sqliteTable(
 export const userRelation = relations(userTable, ({ many }) => ({
   chats: many(chatTable),
   tags: many(tagTable), // named tags when don't use middle table
+  prompts: many(promptTable),
 }));
 
 export const chatRelation = relations(chatTable, ({ one, many }) => ({
@@ -95,6 +111,10 @@ export const chatRelation = relations(chatTable, ({ one, many }) => ({
 
 export const messageRelation = relations(messageTable, ({ one }) => ({
   chat: one(chatTable, { fields: [messageTable.chatId], references: [chatTable.id] }),
+}));
+
+export const promptRelation = relations(promptTable, ({ one }) => ({
+  owner: one(userTable, { fields: [promptTable.ownerId], references: [userTable.id] }),
 }));
 
 export const tagRelation = relations(tagTable, ({ one, many }) => ({
@@ -110,5 +130,6 @@ export const tagToChatRelation = relations(tagToChatTable, ({ one }) => ({
 type User = InferSelectModel<typeof userTable>;
 type Chat = InferSelectModel<typeof chatTable>;
 type Message = InferSelectModel<typeof messageTable>;
+type Prompt = InferSelectModel<typeof promptTable>;
 
-export { User, Chat, Message };
+export { User, Chat, Message, Prompt };
