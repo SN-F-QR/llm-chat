@@ -4,8 +4,10 @@ import reqClient from '../service/requestClient';
 import { IUser } from '../types/types';
 import { useDashboardStore } from '../service/chatState';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router';
 
 const NavBar: React.FC<{ isAuth: boolean }> = ({ isAuth }) => {
+  const navigate = useNavigate();
   const [hover, setHover] = useState(false);
   const expandState = useDashboardStore((state) => state.expandChatList);
   const setExpandState = useDashboardStore((state) => state.setExpand);
@@ -43,6 +45,12 @@ const NavBar: React.FC<{ isAuth: boolean }> = ({ isAuth }) => {
           </button>
           <img className="size-8 rounded-full" src="/logo.jpeg" alt="Logo" />
           <h1 className="text-lg font-semibold select-none">LLM Chat</h1>
+          <span className="ml-2 flex items-center space-x-4 text-sm font-normal">
+            <button className="cursor-pointer text-sm" onClick={() => void navigate('/prompt')}>
+              Prompts
+            </button>
+            <button className="cursor-pointer text-sm">About</button>
+          </span>
         </span>
         <span
           className="flex items-center space-x-2"

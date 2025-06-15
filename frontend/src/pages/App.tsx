@@ -4,6 +4,7 @@ import Login from './Login';
 import SignUp from './Signup';
 import NewChat from './NewChat';
 import Chat from './Chat';
+import Prompt from './Prompt';
 import { BrowserRouter, Routes, Route } from 'react-router';
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
             <Route path="/" element={<Dashboard />}>
               <Route index element={<NewChat />} />
               <Route path=":chatid" element={<Chat />} />
+              <Route path="prompt" element={<Prompt />} />
             </Route>
           </Routes>
         </div>
