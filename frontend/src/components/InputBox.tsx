@@ -1,15 +1,17 @@
-import { SendHorizontal, CircleStop } from 'lucide-react';
+import { SendHorizontal, CircleStop, Bot } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useStore } from '../service/chatState';
 import SelectForm from './SelectForm';
-import { models } from '../service/models';
+import { models, prompts, type BaseModel } from '../service/models';
 
 const InputBox: React.FC<{
   submitFunc: (arg: string) => void;
   waiting: boolean;
   currentModel?: string;
   setModel?: (model: string) => void;
-}> = ({ submitFunc, waiting, currentModel, setModel }) => {
+  currentPrompt?: string;
+  setPrompt?: (prompt: string) => void;
+}> = ({ submitFunc, waiting, currentModel, setModel, currentPrompt, setPrompt }) => {
   const [text, setText] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [isComposing, setIsComposing] = useState<boolean>(false);
@@ -61,8 +63,22 @@ const InputBox: React.FC<{
           className="mb-2 grow resize-none overflow-y-auto pr-2 font-sans placeholder:text-gray-400 placeholder:italic focus:outline-none"
         ></textarea>
         <span className="flex items-end justify-between space-x-2">
-          {/* <span className="flex-grow"></span> */}
-          <ModelSelection currentModel={currentModel} setModel={setModel} />
+          <div className="flex items-center space-x-2">
+            <ModelSelection
+              currentModel={currentModel}
+              setModel={setModel}
+              listWidth="w-72"
+              options={models}
+            />
+            <ModelSelection
+              currentModel={currentPrompt}
+              setModel={setPrompt}
+              listWidth="w-48"
+              options={prompts}
+              buttonContent={<Bot className="size-4 text-gray-600" />}
+            />
+          </div>
+
           {waiting ? (
             <button
               onClick={() => {
@@ -96,30 +112,33 @@ export default InputBox;
  * @param currentModel - The current model 'value' (key)
  * @param setModel - Optional function to set the model, if provided, it will render a select form
  */
-const ModelSelection: React.FC<{ currentModel?: string; setModel?: (model: string) => void }> = ({
-  currentModel,
-  setModel,
-}) => {
-  if (!currentModel) {
-    return (
-      <p className="rounded-full bg-purple-200 px-2 py-1 text-xs text-gray-800 select-none">...</p>
-    );
-  } else
+const ModelSelection: React.FC<{
+  currentModel?: string;
+  setModel?: (model: string) => void;
+  options: Record<string, BaseModel>;
+
+  listWidth?: string;
+  buttonContent?: React.ReactNode;
+}> = ({ currentModel, setModel, options, listWidth, buttonContent }) => {
+  if (currentModel) {
     return (
       <div>
         {!setModel ? (
           <p className="rounded-full bg-purple-200 px-2 py-1 text-xs text-gray-800 select-none">
-            {models[currentModel].name}
+            {buttonContent ?? options[currentModel].name}
           </p>
         ) : (
           <SelectForm
-            className="w-72 text-xs"
+            className="text-xs"
             formName="model"
             value={currentModel}
             onChange={setModel}
-            options={models}
+            options={options}
+            listWidth={listWidth}
+            buttonContent={buttonContent}
           />
         )}
       </div>
     );
+  }
 };

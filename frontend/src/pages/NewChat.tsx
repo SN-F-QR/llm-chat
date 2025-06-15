@@ -12,7 +12,7 @@ import ConversationBox from '../components/ConversationBox';
 const NewChat = () => {
   const queryClient = useQueryClient();
   const [tempMessages, setTempMessages] = useState<IMessage[]>([]);
-  const { model, setModel } = useUserPreferences();
+  const { model, prompt, setModel, setPrompt } = useUserPreferences();
 
   const navigate = useNavigate();
   const newMessage = (role: Role, content: string) => ({
@@ -93,6 +93,8 @@ const NewChat = () => {
             waiting={waiting}
             currentModel={model}
             setModel={setModel}
+            currentPrompt={prompt}
+            setPrompt={setPrompt}
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { models } from './models';
+import { models, prompts } from './models';
 
 export interface ChatState {
   isCreatingNewChat: boolean;
@@ -16,7 +16,9 @@ export interface DashboardState {
 
 export interface UserPreferences {
   model: string;
+  prompt: string;
   setModel: (model: string) => void;
+  setPrompt: (prompt: string) => void;
 }
 
 export const useStore = create<ChatState>((set) => ({
@@ -40,6 +42,12 @@ export const useUserPreferences = create<UserPreferences>()(
       setModel: (model: string) => {
         if (model in models) {
           set({ model: model });
+        }
+      },
+      prompt: 'default-prompt',
+      setPrompt: (prompt: string) => {
+        if (prompt in prompts) {
+          set({ prompt: prompt });
         }
       },
     }),

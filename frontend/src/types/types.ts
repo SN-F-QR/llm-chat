@@ -20,6 +20,13 @@ export interface IChat {
   lastUseAt: string;
 }
 
+export interface IPrompt {
+  publicId: string;
+  name: string;
+  content: string;
+  category: string;
+}
+
 export enum Role {
   user = 0,
   assistant = 1,
