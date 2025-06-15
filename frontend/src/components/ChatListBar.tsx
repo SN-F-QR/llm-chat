@@ -1,5 +1,5 @@
 import { MessageCirclePlus, PanelLeftClose } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useLocation } from 'react-router';
 import { TriangleAlert, Ellipsis } from 'lucide-react';
 import { useDashboardStore } from '../service/chatState';
 import { useStore } from '../service/chatState';
@@ -14,6 +14,7 @@ const ChatListBar: React.FC<{ scrollRef: React.RefObject<HTMLDivElement | null> 
   scrollRef,
 }) => {
   const { chatid } = useParams<{ chatid: string }>();
+  const location = useLocation();
 
   const isCreatingNewChat = useStore((state) => state.isCreatingNewChat);
   const { dropMenuState, menuPos, activeListItem, focusRef, toggleMenu, closeMenu } =
@@ -79,7 +80,7 @@ const ChatListBar: React.FC<{ scrollRef: React.RefObject<HTMLDivElement | null> 
         <ChatListButton
           title="Start a new chat"
           publicId=""
-          isActive={chatid === undefined}
+          isActive={location.pathname === '/'}
           navigate={handleChatClick}
         >
           <MessageCirclePlus className="mr-1 size-5 text-gray-700" />
