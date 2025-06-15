@@ -24,6 +24,7 @@ const chatSchema = z.object({
 
 const messageSchema = z.object({
   content: z.string().min(1, 'Message content cannot be empty'),
+  prompt: z.string().optional(),
 });
 
 const publicIdSchema = z.object({
@@ -150,7 +151,7 @@ chatRouter.post(
   zValidator('param', publicIdSchema),
   zValidator('json', messageSchema),
   async (c) => {
-    const { content } = c.req.valid('json');
+    const { content, prompt } = c.req.valid('json');
     const chat = await db.query.chatTable.findFirst({
       where: eq(chatTable.publicId, c.req.param('publicid')),
       with: {
@@ -161,14 +162,24 @@ chatRouter.post(
       throw new NotFoundError('Chat not exist');
     }
 
-    const formattedMessages = createHistory(chat.messages, content);
+    const formattedMessages = createHistory(chat.messages, prompt ? [prompt, content] : [content]);
     const response = await generateContent(formattedMessages, chat.model);
 
-    await db.insert(messageTable).values({
-      chatId: chat.id,
-      content,
-      role: Role.user,
-    });
+    const insertMsgs = [
+      {
+        chatId: chat.id,
+        content,
+        role: Role.user,
+      },
+    ];
+    if (prompt) {
+      insertMsgs.unshift({
+        chatId: chat.id,
+        content: prompt,
+        role: Role.system,
+      });
+    }
+    await db.insert(messageTable).values(insertMsgs);
 
     c.status(201);
     let finalAnswer = '';

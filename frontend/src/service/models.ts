@@ -33,7 +33,7 @@ export const prompts: Prompts = {
     publicId: 'academic-writer',
     name: 'Writer',
     content:
-      "You are a professional writer. Please adapt the requirement based on the user's input and write a precise and professional paper in academic style.",
+      'You are a professional writer. Please adapt the requirement from users and write a precise and professional paper in academic style.',
     category: 'default',
   },
   'code-assistant': {

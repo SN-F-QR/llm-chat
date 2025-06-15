@@ -19,26 +19,28 @@ const ConversationBox: React.FC<{
 }> = ({ messageList, waiting, failed, reSendMessage }) => {
   const aborter = useRef<AbortController>(new AbortController());
 
-  const messageHistory = messageList.map((message, index) => (
-    <div className="flex items-end space-x-2" key={`${message.createdAt}-${message.role}`}>
-      <MessageBuble message={message} updating={waiting} />
-      {failed && index === messageList.length - 1 && message.role === Role.user && (
-        <span className="flex items-center space-x-2">
-          <TriangleAlert className="size-4 text-red-400" />
-          <RetryButton
-            onClick={() => {
-              const handler = () => {
-                reSendMessage(message.content);
-                aborter.current = new AbortController();
-                return;
-              };
-              void handler();
-            }}
-          />
-        </span>
-      )}
-    </div>
-  ));
+  const messageHistory = messageList
+    .filter((message) => message.role !== Role.system)
+    .map((message, index) => (
+      <div className="flex items-end space-x-2" key={`${message.createdAt}-${message.role}`}>
+        <MessageBuble message={message} updating={waiting} />
+        {failed && index === messageList.length - 1 && message.role === Role.user && (
+          <span className="flex items-center space-x-2">
+            <TriangleAlert className="size-4 text-red-400" />
+            <RetryButton
+              onClick={() => {
+                const handler = () => {
+                  reSendMessage(message.content);
+                  aborter.current = new AbortController();
+                  return;
+                };
+                void handler();
+              }}
+            />
+          </span>
+        )}
+      </div>
+    ));
 
   return (
     <div className="flex w-full max-w-3xl flex-col space-y-4 rounded-2xl p-4 pb-8">

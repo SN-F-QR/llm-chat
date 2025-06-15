@@ -54,7 +54,7 @@ export const useUserPreferences = create<UserPreferences>()(
     {
       name: 'user-preferences',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ model: state.model }),
+      partialize: (state) => ({ model: state.model, prompt: state.prompt }),
     }
   )
 );

@@ -1,6 +1,7 @@
 import { useNavigate, useOutletContext } from 'react-router';
 import { useState } from 'react';
 import { IMessage, IChat, Role } from '../types/types';
+import { prompts } from '../service/models';
 import { useStore, useUserPreferences } from '../service/chatState';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import useListMessage from '../hooks/useListMessage';
@@ -27,9 +28,9 @@ const NewChat = () => {
   const { messagesMutate } = useListMessage('');
 
   const chatsMutate = useMutation({
-    mutationFn: async (content: string) => {
+    mutationFn: async (content: { message: string; prompt?: string }) => {
       const response = await reqClient.client.post<IChat>('/chat', {
-        content: content,
+        content: content.message,
         model: model,
       });
       queryClient.setQueryData<IChat[]>(['chats'], (previous) => {
@@ -56,7 +57,8 @@ const NewChat = () => {
       setIsCreating(false);
       const { publicId } = data;
       messagesMutate.mutate({
-        message: variables,
+        message: variables.message,
+        prompt: variables.prompt,
         chatId: publicId,
       });
 
@@ -72,7 +74,11 @@ const NewChat = () => {
       newMessage(Role.user, content),
       newMessage(Role.assistant, ''),
     ]);
-    chatsMutate.mutate(content);
+    if (prompt !== 'default-prompt') {
+      chatsMutate.mutate({ message: content, prompt: prompts[prompt].content });
+    } else {
+      chatsMutate.mutate({ message: content });
+    }
   };
 
   const waiting = chatsMutate.isPending;

@@ -23,17 +23,20 @@ const generateTitle = async (content: string) => {
   }
 };
 
-const createHistory = (messages: Message[], newContent: string) => {
+const createHistory = (messages: Message[], newContent: string[]) => {
   const history = messages.map((message) => {
     return {
-      role: message.role === 0 ? 'user' : 'model',
+      role: message.role === 1 ? 'model' : 'user',
       parts: [{ text: message.content }],
     };
   });
-  history.push({
-    role: 'user',
-    parts: [{ text: newContent }],
+  newContent.forEach((content) => {
+    history.push({
+      role: 'user',
+      parts: [{ text: content }],
+    });
   });
+
   return history;
 };
 

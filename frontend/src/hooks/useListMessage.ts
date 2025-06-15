@@ -41,15 +41,15 @@ const useListMessage = (chatId: string) => {
   const abortController = useStore((state) => state.abortController);
 
   const messagesMutate = useMutation({
-    mutationFn: async (args: { message: string; chatId: string }) => {
-      const { message, chatId } = args;
+    mutationFn: async (args: { message: string; prompt?: string; chatId: string }) => {
+      const { message, chatId, prompt } = args;
       const response = await fetch(`/api/chat/${chatId}/message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify({ content: message }),
+        body: JSON.stringify({ content: message, prompt }),
         signal: abortController.signal,
       });
 

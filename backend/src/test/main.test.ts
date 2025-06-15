@@ -116,7 +116,10 @@ describe.sequential('main test', () => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${TOKEN}`,
       },
-      body: JSON.stringify({ content: 'How about another joke?' }),
+      body: JSON.stringify({
+        content: 'How about another joke?',
+        prompt: 'Tell me a joke in 50 words.',
+      }),
     });
     expect(response.status).toBe(201);
     expect(response.body).not.toBeNull();
@@ -143,9 +146,10 @@ describe.sequential('main test', () => {
     const body = (await response.json()) as Omit<Chat, 'id'> & {
       messages: Omit<Message, 'id' & 'createdAt'>[];
     };
-    expect(body.messages.length).toBe(2);
+    expect(body.messages.length).toBe(3);
     expect(body.messages[1].content.length).toBeGreaterThan(0);
-    expect(body.messages[1].role).toBe(1);
+    expect(body.messages[0].role).toBe(2);
+    expect(body.messages[1].role).toBe(0);
   });
 
   test('Logout', async () => {
