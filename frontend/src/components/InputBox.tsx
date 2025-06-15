@@ -75,7 +75,11 @@ const InputBox: React.FC<{
               setModel={setPrompt}
               listWidth="w-48"
               options={prompts}
-              buttonContent={<Bot className="size-4 text-gray-600" />}
+              buttonContent={
+                <Bot
+                  className={`size-4 text-gray-600 ${currentPrompt === 'default-prompt' ? 'text-gray-600' : 'text-purple-500'}`}
+                />
+              }
             />
           </div>
 
