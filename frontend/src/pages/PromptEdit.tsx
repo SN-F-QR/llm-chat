@@ -1,5 +1,5 @@
-import { Pencil } from 'lucide-react';
-import { useParams, useNavigate } from 'react-router';
+import { Pencil, ArrowLeft } from 'lucide-react';
+import { useParams, useNavigate, Link } from 'react-router';
 import {
   Form,
   FormField,
@@ -32,32 +32,48 @@ const promptSchema = z.object({
 const PromptEdit: React.FC = () => {
   const navigate = useNavigate();
   const promptId = useParams<{ promptid: string }>().promptid;
-  const promptQuery = useQuery<IPrompt>({
+
+  useQuery<IPrompt>({
     queryKey: ['prompt', promptId],
     queryFn: async () => {
       if (!promptId) return { publicId: '', name: '', content: '', category: 'default' };
       const response = await reqClient.client.get<{ prompt: IPrompt }>(`/prompt/${promptId}`);
+      const { name, content, category } = response.data.prompt;
+      form.reset({
+        name,
+        content,
+        category,
+      });
       return response.data.prompt;
     },
   });
-  const { postPrompt } = usePromptList();
+  const { postPrompt, updatePrompt } = usePromptList();
 
   const form = useForm<Omit<IPrompt, 'publicId'>>({
     resolver: zodResolver(promptSchema),
     defaultValues: {
-      name: promptQuery.data?.name ?? '',
-      content: promptQuery.data?.content ?? '',
-      category: promptQuery.data?.category ?? 'default',
+      name: '',
+      content: '',
+      category: 'default',
     },
   });
 
   const onSubmit: SubmitHandler<Omit<IPrompt, 'publicId'>> = (data) => {
-    postPrompt.mutate(data);
+    if (promptId) {
+      updatePrompt.mutate({ ...data, publicId: promptId });
+    } else {
+      postPrompt.mutate(data);
+    }
     void navigate('/prompt');
   };
 
   return (
     <div className="mt-12 flex w-full flex-col space-y-2 p-4">
+      <Button className="rounded-full" variant="ghost" size="icon" asChild>
+        <Link to="/prompt">
+          <ArrowLeft />
+        </Link>
+      </Button>
       <span className="flex items-center space-x-2 py-2 text-2xl">
         <Pencil />
         <h3>{promptId ? 'Edit Prompt' : 'Create Prompt'}</h3>
@@ -108,7 +124,7 @@ const PromptEdit: React.FC = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-fit bg-purple-500 hover:bg-purple-400">
+          <Button type="submit" className="w-fit cursor-pointer bg-purple-500 hover:bg-purple-400">
             Save
           </Button>
         </form>

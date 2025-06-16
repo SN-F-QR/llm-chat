@@ -27,6 +27,7 @@ const Prompt: React.FC = () => {
           <PromptItem
             key={prompts[key].name}
             name={prompts[key].name}
+            publicId=""
             content={prompts[key].content}
           />
         ))}
@@ -35,7 +36,7 @@ const Prompt: React.FC = () => {
       <div className="flex w-full flex-col space-y-2 pb-4">
         <span className="flex items-center justify-between">
           <h4 className="text-xl">Your Prompts</h4>
-          <Button className="bg-purple-500 hover:bg-purple-400" size="sm">
+          <Button className="bg-purple-500 hover:bg-purple-400" size="sm" asChild>
             <Link to="/prompt/edit" className="flex items-center">
               <Plus className="mr-1" /> Create
             </Link>
@@ -46,6 +47,7 @@ const Prompt: React.FC = () => {
             key={`prompt-${prompt.publicId}`}
             name={prompt.name}
             content={prompt.content}
+            publicId={prompt.publicId}
             onDuplicate={() => duplicatePrompt(prompt.publicId)}
             onDelete={() => deletePrompt.mutate(prompt.publicId)}
           />
@@ -58,10 +60,10 @@ const Prompt: React.FC = () => {
 const PromptItem: React.FC<{
   name: string;
   content: string;
-  onEdit?: () => void;
+  publicId: string;
   onDuplicate?: () => void;
   onDelete?: () => void;
-}> = ({ name, content, onEdit, onDuplicate, onDelete }) => {
+}> = ({ name, content, publicId, onDuplicate, onDelete }) => {
   return (
     <div className="enable-animation flex w-full items-center justify-between rounded-lg border border-gray-200 p-4 select-none hover:bg-purple-100">
       <div className="flex w-full items-center justify-between">
@@ -77,9 +79,11 @@ const PromptItem: React.FC<{
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="mx-2 w-32">
-              <DropdownMenuItem onClick={onEdit}>
-                <Pencil />
-                Edit
+              <DropdownMenuItem asChild>
+                <Link to={`/prompt/${publicId}`} className="flex items-center space-x-1">
+                  <Pencil />
+                  Edit
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onDuplicate}>
                 <Copy />

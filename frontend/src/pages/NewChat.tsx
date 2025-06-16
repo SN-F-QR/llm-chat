@@ -4,6 +4,7 @@ import { IMessage, IChat, Role } from '../types/types';
 import { prompts } from '../service/models';
 import { useStore, useUserPreferences } from '../service/chatState';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
+import usePromptList from '@/hooks/usePromptList';
 import useListMessage from '../hooks/useListMessage';
 import reqClient from '../service/requestClient';
 
@@ -26,6 +27,7 @@ const NewChat = () => {
   const setIsCreating = useStore((state) => state.setCreatingNewChat);
   const chatListScrollRef = useOutletContext<React.RefObject<HTMLDivElement | null>>();
   const { messagesMutate } = useListMessage('');
+  const userPrompts = usePromptList().promptsQuery.data;
 
   const chatsMutate = useMutation({
     mutationFn: async (content: { message: string; prompt?: string }) => {
@@ -68,6 +70,13 @@ const NewChat = () => {
     },
   });
 
+  const fullPrompts = { ...prompts };
+  if (userPrompts) {
+    userPrompts.forEach((p) => {
+      fullPrompts[p.publicId] = p;
+    });
+  }
+
   const sendFirstMessage = (content: string) => {
     setTempMessages((prev) => [
       ...prev,
@@ -99,6 +108,7 @@ const NewChat = () => {
             waiting={waiting}
             currentModel={model}
             setModel={setModel}
+            prompts={fullPrompts}
             currentPrompt={prompt}
             setPrompt={setPrompt}
           />

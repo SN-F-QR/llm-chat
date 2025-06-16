@@ -2,16 +2,17 @@ import { SendHorizontal, CircleStop, Bot } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useStore } from '../service/chatState';
 import SelectForm from './SelectForm';
-import { models, prompts, type BaseModel } from '../service/models';
+import { models, type BaseModel } from '../service/models';
 
 const InputBox: React.FC<{
   submitFunc: (arg: string) => void;
   waiting: boolean;
   currentModel?: string;
   setModel?: (model: string) => void;
+  prompts?: Record<string, BaseModel>;
   currentPrompt?: string;
   setPrompt?: (prompt: string) => void;
-}> = ({ submitFunc, waiting, currentModel, setModel, currentPrompt, setPrompt }) => {
+}> = ({ submitFunc, waiting, currentModel, setModel, prompts, currentPrompt, setPrompt }) => {
   const [text, setText] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [isComposing, setIsComposing] = useState<boolean>(false);
@@ -119,17 +120,17 @@ export default InputBox;
 const ModelSelection: React.FC<{
   currentModel?: string;
   setModel?: (model: string) => void;
-  options: Record<string, BaseModel>;
+  options?: Record<string, BaseModel>;
 
   listWidth?: string;
   buttonContent?: React.ReactNode;
 }> = ({ currentModel, setModel, options, listWidth, buttonContent }) => {
-  if (currentModel) {
+  if (currentModel && options) {
     return (
       <div>
         {!setModel ? (
           <p className="rounded-full bg-purple-200 px-2 py-1 text-xs text-gray-800 select-none">
-            {buttonContent ?? options[currentModel].name}
+            {buttonContent ?? options[currentModel]?.name ?? '...'}
           </p>
         ) : (
           <SelectForm

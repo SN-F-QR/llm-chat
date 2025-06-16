@@ -24,7 +24,7 @@ const SelectForm: React.FC<{
   options: Record<string, { name: string; description?: string }>;
 }> = ({ className, listWidth, buttonContent, formName, value, onChange, options }) => {
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
-  const currentOptionName = options[value].name;
+  const currentOptionName = options[value]?.name ?? '...';
 
   return (
     <div className={`relative ${className}`}>

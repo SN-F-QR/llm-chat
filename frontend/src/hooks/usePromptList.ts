@@ -22,6 +22,24 @@ const usePromptList = () => {
     },
   });
 
+  const updatePrompt = useMutation({
+    mutationFn: async (prompt: IPrompt) => {
+      const response = await reqClient.client.put<{ prompt: IPrompt }>(
+        `/prompt/${prompt.publicId}`,
+        {
+          name: prompt.name,
+          content: prompt.content,
+          category: prompt.category,
+        }
+      );
+      return response.data.prompt;
+    },
+    onSuccess: (prompt) => {
+      void queryClient.invalidateQueries({ queryKey: ['prompts'] });
+      void queryClient.invalidateQueries({ queryKey: ['prompt', prompt.publicId] });
+    },
+  });
+
   const duplicatePrompt = (publicId: string) => {
     const prompt = promptsQuery.data?.find((p) => p.publicId === publicId);
     if (prompt) {
@@ -46,6 +64,7 @@ const usePromptList = () => {
   return {
     promptsQuery,
     postPrompt,
+    updatePrompt,
     duplicatePrompt,
     deletePrompt,
   };
