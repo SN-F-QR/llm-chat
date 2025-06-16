@@ -84,7 +84,7 @@ const NewChat = () => {
       newMessage(Role.assistant, ''),
     ]);
     if (prompt !== 'default-prompt') {
-      chatsMutate.mutate({ message: content, prompt: prompts[prompt].content });
+      chatsMutate.mutate({ message: content, prompt: fullPrompts[prompt].content });
     } else {
       chatsMutate.mutate({ message: content });
     }
