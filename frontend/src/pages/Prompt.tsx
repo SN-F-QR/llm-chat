@@ -1,4 +1,5 @@
 import usePromptList from '@/hooks/usePromptList';
+import { Link } from 'react-router';
 import { prompts } from '@/service/models';
 import { Bot, Plus, Ellipsis, Pencil, Copy, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,7 @@ import {
 const Prompt: React.FC = () => {
   const { promptsQuery, duplicatePrompt, deletePrompt } = usePromptList();
   return (
-    <div className="mt-12 flex w-full flex-col space-y-2 overflow-auto p-4">
+    <div className="scrollbar mt-12 flex max-h-[95dvh] w-full flex-col space-y-2 overflow-auto p-4">
       <span className="inline-flex items-center space-x-2">
         <Bot className="size-7 text-purple-500" />
         <h3 className="py-2 text-2xl">Prompt Setting</h3>
@@ -35,7 +36,9 @@ const Prompt: React.FC = () => {
         <span className="flex items-center justify-between">
           <h4 className="text-xl">Your Prompts</h4>
           <Button className="bg-purple-500 hover:bg-purple-400" size="sm">
-            <Plus /> Create
+            <Link to="/prompt/edit" className="flex items-center">
+              <Plus className="mr-1" /> Create
+            </Link>
           </Button>
         </span>
         {promptsQuery.data?.map((prompt) => (
@@ -64,7 +67,7 @@ const PromptItem: React.FC<{
       <div className="flex w-full items-center justify-between">
         <div className="flex flex-col">
           <h5 className="text-lg font-semibold">{name}</h5>
-          <p className="text-sm text-gray-600">{content}</p>
+          <p className="line-clamp-2 text-sm text-gray-600">{content}</p>
         </div>
         {onDelete && (
           <DropdownMenu>
