@@ -7,6 +7,7 @@ import { cors } from 'hono/cors';
 import db from './database';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import path from 'path';
+import { customLogger } from './utils/logHelper';
 
 import apiRouter from './api';
 
@@ -14,7 +15,7 @@ const app = new Hono();
 const PORT: number = +(process.env.PORT ?? '3001');
 const staticPath = './static';
 
-app.use(logger());
+app.use(logger(customLogger));
 app.use('api', cors());
 app.route('/api', apiRouter);
 

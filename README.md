@@ -17,7 +17,7 @@ A full-stack simple chat system for LLMs
 **Frontend:**
 
 - React + Vite
-- Tailwindcss
+- Shadcn/ui + Tailwindcss
 - Shiki
 - TanStack Query
 
@@ -26,6 +26,7 @@ A full-stack simple chat system for LLMs
 - 💬 Google Gemini, flash and pro
 - 🔄 Streaming chat responses
 - 📝 Auto-generate chat titles
+- 🤖 Prompt setting
 - 👤 User management with JWT auth
 
 ## Development Setup
