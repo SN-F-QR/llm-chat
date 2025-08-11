@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from 'react-router';
 import NavBar from '../components/NavBar';
 import ChatListBar from '../components/ChatListBar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import reqClient from '@/service/requestClient';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,7 +19,7 @@ const Dashboard = () => {
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const chatListDivRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!localStorage.getItem('token')) {
+    if (!reqClient.isLogin) {
       void navigate('/auth');
     }
     setIsAuth(true);

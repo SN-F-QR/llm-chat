@@ -1,10 +1,11 @@
 import { useNavigate, Outlet } from 'react-router';
 import { useEffect } from 'react';
+import reqClient from '@/service/requestClient';
 
 const Auth = () => {
   const navigate = useNavigate();
   useEffect(() => {
-    if (localStorage.getItem('token')) {
+    if (reqClient.isLogin) {
       void navigate('/');
     }
   }, []);
