@@ -1,6 +1,6 @@
 import { MessageCirclePlus, PanelLeftClose } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router';
-import { TriangleAlert, Ellipsis, Trash2 } from 'lucide-react';
+import { TriangleAlert, Ellipsis, Pen, Trash2 } from 'lucide-react';
 import { useDashboardStore } from '../service/chatState';
 import { useStore } from '../service/chatState';
 import React, { useEffect } from 'react';
@@ -111,10 +111,11 @@ const ChatListButton: React.FC<{
   publicId: string;
   isActive: boolean;
   navigate: (string: string) => void;
+  onRename?: () => void;
   onDelete?: () => void;
   //openDropMenu?: (publicId: string, clickBottom: number) => void;
   children?: React.ReactNode;
-}> = ({ title, publicId, isActive, navigate, children, onDelete }) => {
+}> = ({ title, publicId, isActive, navigate, children, onRename, onDelete }) => {
   return (
     <span className="group relative w-full px-2">
       <span
@@ -141,9 +142,13 @@ const ChatListButton: React.FC<{
                 <Ellipsis />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="mx-2 w-32">
-              <DropdownMenuItem onClick={onDelete}>
-                <Trash2 />
+            <DropdownMenuContent>
+              <DropdownMenuItem className="text-xs" onClick={onRename}>
+                <Pen className="size-4" />
+                Rename
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-xs" onClick={onDelete}>
+                <Trash2 className="size-4" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>

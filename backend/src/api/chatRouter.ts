@@ -93,6 +93,32 @@ chatRouter.get('/', async (c) => {
   });
 });
 
+chatRouter.put('/:publicid', zValidator('param', publicIdSchema), async (c) => {
+  const publicId = c.req.param('publicid');
+  const { title }: { title: string } = await c.req.json();
+  if (title.length < 1) {
+    c.status(422);
+    return c.text('Title cannot be empty');
+  }
+
+  try {
+    const updatedChat = await db
+      .update(chatTable)
+      .set({ title })
+      .where(eq(chatTable.publicId, publicId))
+      .returning();
+
+    c.status(200);
+    return c.json({
+      ...updatedChat[0],
+      id: undefined,
+    });
+  } catch (error) {
+    console.error('Error updating chat:', error);
+    throw new Error('Error updating chat');
+  }
+});
+
 chatRouter.delete('/:publicid', zValidator('param', publicIdSchema), async (c) => {
   const publicId = c.req.param('publicid');
   try {
