@@ -1,14 +1,18 @@
 import { MessageCirclePlus, PanelLeftClose } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router';
-import { TriangleAlert, Ellipsis } from 'lucide-react';
+import { TriangleAlert, Ellipsis, Trash2 } from 'lucide-react';
 import { useDashboardStore } from '../service/chatState';
 import { useStore } from '../service/chatState';
 import React, { useEffect } from 'react';
-
-import useListDropMenu from '../hooks/useDropMeun';
-import EditMenu from '../components/DropMenu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 import useChatList from '../hooks/useChatList';
+import { Button } from '@/components/ui/button';
 
 const ChatListBar: React.FC<{ scrollRef: React.RefObject<HTMLDivElement | null> }> = ({
   scrollRef,
@@ -17,8 +21,6 @@ const ChatListBar: React.FC<{ scrollRef: React.RefObject<HTMLDivElement | null> 
   const location = useLocation();
 
   const isCreatingNewChat = useStore((state) => state.isCreatingNewChat);
-  const { dropMenuState, menuPos, activeListItem, focusRef, toggleMenu, closeMenu } =
-    useListDropMenu();
   const { chatsQuery, chatsMutations } = useChatList(); // manage list and delete chat
 
   const expandState = useDashboardStore((state) => state.expandChatList);
@@ -57,20 +59,9 @@ const ChatListBar: React.FC<{ scrollRef: React.RefObject<HTMLDivElement | null> 
       publicId={chat.publicId}
       isActive={chatid === chat.publicId}
       navigate={handleChatClick}
-      openDropMenu={toggleMenu}
+      onDelete={() => chatsMutations.mutate(chat.publicId)}
     />
   ));
-
-  const dropMenuFcList = {
-    Rename: () => console.log('rename', activeListItem),
-    Delete: () => {
-      if (!activeListItem) return;
-      chatsMutations.mutate(activeListItem);
-      if (chatid === activeListItem) {
-        void navigate('/');
-      }
-    },
-  };
 
   return (
     <div
@@ -109,15 +100,6 @@ const ChatListBar: React.FC<{ scrollRef: React.RefObject<HTMLDivElement | null> 
         >
           <PanelLeftClose className="size-5 text-gray-500" />
         </button>
-
-        {dropMenuState && activeListItem && (
-          <EditMenu
-            ref={focusRef}
-            topPos={menuPos}
-            DropFcList={dropMenuFcList}
-            onClick={closeMenu}
-          />
-        )}
       </div>
     </div>
   );
@@ -129,19 +111,14 @@ const ChatListButton: React.FC<{
   publicId: string;
   isActive: boolean;
   navigate: (string: string) => void;
-  openDropMenu?: (publicId: string, clickBottom: number) => void;
+  onDelete?: () => void;
+  //openDropMenu?: (publicId: string, clickBottom: number) => void;
   children?: React.ReactNode;
-}> = ({ title, publicId, isActive, navigate, children, openDropMenu }) => {
-  const handleDropButtonClick = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    if (!openDropMenu) return;
-    openDropMenu(publicId, rect.bottom);
-  };
-
+}> = ({ title, publicId, isActive, navigate, children, onDelete }) => {
   return (
     <span className="group relative w-full px-2">
       <span
-        className={`${isActive ? 'bg-purple-200' : ''} group flex w-full items-center rounded-2xl px-4 hover:bg-purple-200`}
+        className={`${isActive ? 'bg-purple-200' : ''} group flex w-full items-center rounded-3xl px-4 hover:bg-purple-200`}
       >
         <button
           className={`flex w-full cursor-pointer items-center justify-start py-2`}
@@ -150,23 +127,34 @@ const ChatListButton: React.FC<{
           }}
         >
           {children}
-          <p className="line-clamp-1 text-left">{title}</p>
+          <p className="line-clamp-1 text-left text-sm">{title}</p>
         </button>
 
-        {openDropMenu && (
-          <button
-            className="ml-auto hidden size-6 shrink-0 items-center justify-center rounded-full group-hover:flex hover:bg-purple-300"
-            onClick={handleDropButtonClick}
-          >
-            <Ellipsis className="size-4 text-gray-500" />
-          </button>
+        {onDelete && (
+          <DropdownMenu>
+            <DropdownMenuTrigger className="opacity-0 group-hover:opacity-100" asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-6 rounded-full hover:bg-purple-300"
+              >
+                <Ellipsis />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="mx-2 w-32">
+              <DropdownMenuItem onClick={onDelete}>
+                <Trash2 />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </span>
-      {openDropMenu && (
-        <div className="hidden group-hover:block">
-          <FullTitle title={title} />
-        </div>
-      )}
+
+      {/* Full title shown on hover */}
+      <div className="hidden group-hover:block">
+        <FullTitle title={title} />
+      </div>
     </span>
   );
 };
