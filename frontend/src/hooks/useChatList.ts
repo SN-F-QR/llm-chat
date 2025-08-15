@@ -15,7 +15,7 @@ const useChatList = () => {
     },
   });
 
-  const chatRename = useMutation({
+  const renameChat = useMutation({
     mutationFn: async (data: { publicId: string; title: string }) => {
       await reqClient.client.put(`/chat/${data.publicId}`, { title: data.title });
     },
@@ -24,7 +24,7 @@ const useChatList = () => {
     },
   });
 
-  const chatsMutations = useMutation({
+  const deleteChat = useMutation({
     mutationFn: async (publicId: string) => {
       await reqClient.client.delete(`/chat/${publicId}`);
     },
@@ -35,8 +35,8 @@ const useChatList = () => {
 
   return {
     chatsQuery,
-    chatRename,
-    chatsMutations,
+    renameChat,
+    deleteChat,
   };
 };
 

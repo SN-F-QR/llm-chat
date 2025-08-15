@@ -4,15 +4,28 @@ import { TriangleAlert, Ellipsis, Pen, Trash2 } from 'lucide-react';
 import { useDashboardStore } from '../service/chatState';
 import { useStore } from '../service/chatState';
 import React, { useEffect } from 'react';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogTitle,
+  DialogContent,
+  DialogHeader,
+  DialogDescription,
+  DialogClose,
+  DialogFooter,
+} from '@/components/ui/dialog';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 import useChatList from '../hooks/useChatList';
-import { Button } from '@/components/ui/button';
 
 const ChatListBar: React.FC<{ scrollRef: React.RefObject<HTMLDivElement | null> }> = ({
   scrollRef,
@@ -21,7 +34,7 @@ const ChatListBar: React.FC<{ scrollRef: React.RefObject<HTMLDivElement | null> 
   const location = useLocation();
 
   const isCreatingNewChat = useStore((state) => state.isCreatingNewChat);
-  const { chatsQuery, chatsMutations } = useChatList(); // manage list and delete chat
+  const { chatsQuery, renameChat, deleteChat } = useChatList(); // manage list and delete chat
 
   const expandState = useDashboardStore((state) => state.expandChatList);
   const setExpandState = useDashboardStore((state) => state.setExpand);
@@ -59,7 +72,8 @@ const ChatListBar: React.FC<{ scrollRef: React.RefObject<HTMLDivElement | null> 
       publicId={chat.publicId}
       isActive={chatid === chat.publicId}
       navigate={handleChatClick}
-      onDelete={() => chatsMutations.mutate(chat.publicId)}
+      onRename={(title) => renameChat.mutate({ publicId: chat.publicId, title })}
+      onDelete={() => deleteChat.mutate(chat.publicId)}
     />
   ));
 
@@ -111,11 +125,19 @@ const ChatListButton: React.FC<{
   publicId: string;
   isActive: boolean;
   navigate: (string: string) => void;
-  onRename?: () => void;
+  onRename?: (title: string) => void;
   onDelete?: () => void;
   //openDropMenu?: (publicId: string, clickBottom: number) => void;
   children?: React.ReactNode;
 }> = ({ title, publicId, isActive, navigate, children, onRename, onDelete }) => {
+  const handleRenameSubmit = (data: FormData) => {
+    const title = data.get('title') as string;
+    if (title.trim() === '') {
+      return;
+    }
+    onRename?.(title);
+  };
+
   return (
     <span className="group relative w-full px-2">
       <span
@@ -132,27 +154,51 @@ const ChatListButton: React.FC<{
         </button>
 
         {onDelete && (
-          <DropdownMenu>
-            <DropdownMenuTrigger className="opacity-0 group-hover:opacity-100" asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-6 rounded-full hover:bg-purple-300"
-              >
-                <Ellipsis />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem className="text-xs" onClick={onRename}>
-                <Pen className="size-4" />
-                Rename
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-xs" onClick={onDelete}>
-                <Trash2 className="size-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Dialog>
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger className="opacity-0 group-hover:opacity-100" asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-6 rounded-full hover:bg-purple-300"
+                >
+                  <Ellipsis />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem className="text-xs">
+                    <Pen className="size-4" />
+                    Rename
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <DropdownMenuItem className="text-xs" onClick={onDelete}>
+                  <Trash2 className="size-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Rename the chat</DialogTitle>
+                <DialogDescription>Enter a new name for the chat.</DialogDescription>
+                <form action={handleRenameSubmit}>
+                  <Input name="title" defaultValue={title} />
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button
+                        type="submit"
+                        className="mt-2 cursor-pointer bg-purple-500 hover:bg-purple-400"
+                      >
+                        Save
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </form>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
         )}
       </span>
 
