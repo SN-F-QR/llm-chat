@@ -18,7 +18,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.9.0",
   "devDependencies": {
-    "@eslint/js": "^9.29.0",
+    "@eslint/js": "^9.33.0",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "concurrently": "^9.1.2",
