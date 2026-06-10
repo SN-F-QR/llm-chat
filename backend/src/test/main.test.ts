@@ -1,5 +1,27 @@
-import { describe, test, expect } from 'vitest';
-import { User, Chat, Message } from '../drizzle/schema';
+import { describe, test, expect, vi } from 'vitest';
+import type { User, Chat, Message } from '../drizzle/schema';
+
+vi.mock('../utils/llmHelper', () => ({
+  createHistory: (
+    messages: Message[],
+    newContent: string[]
+  ): { role: string; parts: { text: string }[] }[] => [
+    ...messages.map((message) => ({
+      role: message.role === 1 ? 'model' : 'user',
+      parts: [{ text: message.content }],
+    })),
+    ...newContent.map((content) => ({
+      role: 'user',
+      parts: [{ text: content }],
+    })),
+  ],
+  generateTitle: vi.fn(async () => 'Test Chat Title'),
+  generateContent: vi.fn(async function* () {
+    yield { text: 'This is a mocked response.' };
+    yield { candidates: [{ finishReason: 'STOP' }] };
+  }),
+}));
+
 import app from '../index';
 
 describe.sequential('main test', () => {

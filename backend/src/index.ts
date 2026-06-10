@@ -22,10 +22,12 @@ app.route('/api', apiRouter);
 app.use('/static/*', serveStatic({ root: staticPath }));
 app.use('*', serveStatic({ root: staticPath, index: 'index.html' }));
 
-serve({
-  fetch: app.fetch,
-  port: PORT,
-});
+if (process.env.NODE_ENV !== 'test') {
+  serve({
+    fetch: app.fetch,
+    port: PORT,
+  });
+}
 
 console.log(`migration folder: ${path.resolve(__dirname, './drizzle/')}`);
 migrate(db, {
